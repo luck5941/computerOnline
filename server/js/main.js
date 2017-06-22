@@ -18,7 +18,8 @@ Array.prototype.getIndex = function(str) {
 
 
 function SYSTEM(){
-	this.selected = []
+	this.selected = [];
+	this.selectedName = [];
 	this.load = function() {
 		/*
 		*Con está función se pretende "pedir" al servidor todas
@@ -62,19 +63,56 @@ function SYSTEM(){
 
 	this.unselect = function(){
 		this.selected = [];
+		this.selectedName = [];
 		$('.element').removeAttr('style').find('.name').removeAttr('style');
 	}
 
 	this.changeName = function(){
 		$('body').removeAttr('onselectstart');
-		for (var i = 0; i<this.selected.length; i++){
-			$('#'+this.selected[i]).find('.name').attr('contenteditable', 'true').css({'border-bottom': '1px solid black'}).focus().select();
-		}
+		this.selectedName.push($('#'+this.selected[0]).find('.name').html())
+		$('#'+this.selected[0]).find('.name').attr('contenteditable', 'true').css({'border-bottom': '1px solid black'}).focus().select();
+		console.log(this.selectedName[0] + 'linea 74-> changeName')
+		
 	}
 	
-	this.exitChangeName = function(){
+	this.exitChangeName = function(newName){
+		alert('numero de veces que entra')
 		$('body').removeAttr('onselectstart');
+		newName.parent().parent().attr('id', newName.html());
 		$('.name').css({'border': 'none'}).removeAttr('contenteditable');
+		if (typeof this.selectedName[0] == 'undefined') this.selectedName[0] = newName.html().replace('<br>', '');
+		$.post('server/php/proccess.php', {'function':'changeName', 'name': [this.selectedName[0], newName.html().replace('<br>', '')]}, function(d){console.log('la respuesta es: '+d)});
+	}
+
+	this.newFolder = function() {
+		$('main').append("<div class=\"element\" id=\"nuevaCarpeta\"><div class=\"folderIcon\"><img src=\"server/img/folder.svg\"><div class=\"name\" contenteditable=\"true\">nuevaCarpeta</div></div></div>");
+		$('body').removeAttr('onselectstart');
+		this.selected = ['nuevaCarpeta'];
+		this.selected = ['nuevaCarpeta'];
+		$('#'+this.selected[0]).find('.name').attr('contenteditable', 'true').css({'border-bottom': '1px solid black'}).focus().select();
+	}
+
+	this.openFolder = function(name) {
+		$.post('server/php/proccess.php', {'function': 'openDirectory', 'name': name}, function(d){
+			$('main').html(d);
+		});
+	}
+
+	this.exit = function() {
+		$("[value='exit']").click();
+	}
+	this.download = function() {
+		names = [];
+		for (var i = 0; i<this.selected.length; i++){
+			names.push($('#' + this.selected[i]).find('.name').html());
+		}
+		$.post('server/php/proccess.php', {'function': 'download', 'name': names});
+	}
+	this.upLevel = function() {
+
+		$.post('server/php/proccess.php', {'function': 'upLevel'}, function(d){
+			$('main').html(d);
+		});
 	}
 
 	this.load();
@@ -108,8 +146,10 @@ function loadElemts() {
 
 
 
-$('body').on('click', '.element', function(){
-	return (!add ) ? sys.selectOne($(this)): sys.select($(this)) ;
+$('body').on('click', '.folderIcon', function(){
+	(!add ) ? 
+		sys.selectOne($(this).parent()) : 
+		sys.select($(this).parent()) ;
 });
 
 $(document).on('keyup keydown', function(e){
@@ -117,21 +157,37 @@ $(document).on('keyup keydown', function(e){
 	sys.select($(this));
 });
 
-$('body').on('dbclick', '.element', function(){
-		var id = $(this).attr('class');
-		console.log(id);
-		sys.loadMoreFolder(id);
+$('body').on('dblclick', '.folderIcon', function(){
+	if ($(this).parent().attr('id') == 'upLevel') return;
+	var id = $(this).find('.name').html();
+	console.log(id);
+	sys.openFolder(id);
 });
 
 $('body').on('keyup keydown', '.element .name', function(e){
 	if (e.which !== 13) return;
 	e.preventDefault();
-	sys.exitChangeName();
+	sys.exitChangeName($(this));
 	sys.unselect();
 	
 });
 
 $('body, main').click(function(e){if (e.target !== this) return; sys.unselect();});
+
+$('#añadir').click(function(){
+	sys.newFolder();
+});
+
+$('#exit').click(function(e){sys.exit();})
+
+$('#descargar').click(function(e){sys.download();});
+
+$('body').on('dblclick', '#upLevel .folderIcon', function(){
+	sys.upLevel();
+});
+
+
+
 
 $(document).keydown(function(e){
 	var key = e.which;

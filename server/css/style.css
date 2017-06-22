@@ -44,10 +44,10 @@ main {
 .element svg, .element img {
 	width: 50%;
 }
-.element:hover{
+.folderIcon:hover{
 	background-color: #00edff20;
 }
-.element:hover, .option:hover, #exit:hover {
+.folderIcon:hover, .option:hover, #exit:hover {
 	cursor: pointer;
 }
 
@@ -82,4 +82,24 @@ header {
  }
  #exit:hover .line {
  	stroke: white; 	
+ }
+ #upLevel{
+ 	width: 96%;
+ 	display: block;
+ 	border-bottom: 4px solid #00C9CE;
+ 	padding-bottom: 0.5%;
+ }
+
+#upLevel * {
+	float: left;
+}
+#path{
+	color: #00C9CE;
+	font-family: sans-serif;
+	font-size: 24pt;
+}
+
+
+ #upLevel .folderIcon{
+ 	width: 5%;
  }
