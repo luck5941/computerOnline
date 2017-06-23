@@ -10,6 +10,8 @@ switch ($function){
 		break;
 	case 'exit':
 		$user->exit();
+		$sys = new SYSTEM();
+		$sys->removeDir('../download');
 		header('location: ../../home.html');
 		
 

@@ -20,11 +20,10 @@ switch ($function) {
 		echo $sys->upLevel();
 		break;
 	case 'download':
-		$sys->download($_POST['names']);
-		(count($_POST['names']) > 1) ? ('location: descarga.php?names=descarga') : ('location: descarga.php?names='.$names[0]) ;
+		echo $sys->download($_POST['names']);
 		break;
 	default:
-		echo $function;		
+		echo $function;
 		break;
 }
 

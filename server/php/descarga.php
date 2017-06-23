@@ -1,9 +1,9 @@
 <?php
 session_start();
-$name=$_GET['name'];
-$path = $_SESSION['path'];
+$name=$_GET['names'];
+$ext = explode('.', $name)[1];
 header("Content-disposition: attachment; filename=$name");
-header("Content-type: application/pdf");
-readfile("../../server/download/download_");
+//header("Content-type: application/pdf");
+readfile("../download/download_.$ext");
 
 ?>

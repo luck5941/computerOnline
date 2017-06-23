@@ -106,7 +106,8 @@ function SYSTEM(){
 		for (var i = 0; i<this.selected.length; i++){
 			names.push($('#' + this.selected[i]).find('.name').html());
 		}
-		$.post('server/php/proccess.php', {'function': 'download', 'name': names});
+		$.post('server/php/proccess.php', {'function': 'download', 'names': names}, function(d){$('body').html(d)});
+		//location.href = 'server/php/descarga.php?names='+names[0]
 	}
 	this.upLevel = function() {
 
