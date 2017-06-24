@@ -116,6 +116,31 @@ function SYSTEM(){
 		});
 	}
 
+	this.upLoadFiles = function(files) {
+		var data = new FormData();
+		if(files){
+			$.each(files, function(i, file){
+				console.log("file"+ i);
+				console.log(file);
+				data.append("files[]", file);
+			});
+		}
+
+		$.ajax({
+			url: "server/php/proccess.php",
+			type: 'POST',
+			data: data,
+			processData: false,
+			contentType: false,
+			success: function(d) {
+				$('main').append(d);
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				console.log(xhr+"\n"+ ajaxOptions+"\n"+ thrownError);
+			}
+		})
+	}
+
 	this.load();
 }
 
@@ -187,7 +212,26 @@ $('body').on('dblclick', '#upLevel .folderIcon', function(){
 	sys.upLevel();
 });
 
+$('#lavel').on('dragover', function(e){
+	e.preventDefault();
+	e.stopPropagation();
+}).on('dragenter', function(e){
+	e.preventDefault();
+	e.stopPropagation();
+}).on('drop', function(e){
+	if(e.originalEvent.dataTransfer){
+		if(e.originalEvent.dataTransfer.files.length){
+			e.preventDefault();
+			e.stopPropagation();
+			//alert(e.originalEvent.dataTransfer.files.length);
+			var files = e.originalEvent.dataTransfer.files;
+			sys.upLoadFiles(files)
+			//$('#files').attr('value', files);
 
+
+		}
+	}
+})
 
 
 $(document).keydown(function(e){
@@ -212,4 +256,11 @@ $(document).keydown(function(e){
 
 $('main').css({'height': h*0.8});
 $('header').css({'height': w*0.06});
+
+
+
+$('form#fileupload').submit(function(e){
+	e.preventDefault();
+	console.log($(this).find('#files').val());
+});
 

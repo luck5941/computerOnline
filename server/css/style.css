@@ -50,6 +50,8 @@ main {
 .folderIcon:hover, .option:hover, #exit:hover {
 	cursor: pointer;
 }
+/*#home form{display: none;}*/
+
 
 header {
 	width: 80%;

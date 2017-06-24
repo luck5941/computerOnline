@@ -1,3 +1,7 @@
+<?php
+if (isset($_SESSION)) {return header('location: index.html');}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,8 +31,8 @@
 			</div>
 		</nav>
 </header>
-<main>
-	
+
+<main id="lavel">	
 	<div class="element">
 		<div class="folderIcon">
 			<img src="server/img/folder.svg">
@@ -85,7 +89,7 @@
 	</div>
 	
 </main>
-<form style="display:none" action="server/php/registro.php" method="POST"><input name="function" type="submit" value="exit"/></form>
+<form action="server/php/registro.php" method="POST"><input name="function" type="submit" value="exit"/></form>
 <div id=exit>
 	<svg viewBox="0 0 100 100" preserveAspectRatio="none">
 		<circle cx="50" cy="50" r="40" class="line"/>

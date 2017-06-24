@@ -13,7 +13,7 @@ if (!isset($_SESSION['path']))
 
 class REGISTRO{
 	public function login($user, $pssw){
-		global $sql;				
+		global $sql;
 		$check =  mysqli_query($sql, "SELECT id_users from usuarios where user='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
@@ -140,7 +140,7 @@ class SYSTEM{
 				$this->copyFiles($file, '../tmp/');
 			}
 			$this->compress(['../tmp'], 'descarga.zip');
-			$this->removeDir('../tem');
+			$this->removeDir('../tmp');
 		}
 		
 	}
@@ -175,17 +175,26 @@ class SYSTEM{
 	}
 
 	public function removeDir($path){
+		echo "<br>path->$path<br>";
 		if (is_file($path))
-			unlink($path);
+			echo (unlink($path))? "Se ha borrado el archivo $path": "No se ha borrado el archivo $path";
 		elseif (is_dir($path)){
 			$f = array_diff(scandir($path), ['.','..']);
 			foreach ($f as $key ) {
 				$this->removeDir("$path/$key");
 			}
-
+			rmdir($path);
 		}
 	}
-		
+	
+	public function upLoad($files){
+		for($i = 0; $i< count($files['files']['tmp_name']);$i++){
+			if(move_uploaded_file($files['files']['tmp_name'][$i], $_SESSION['path']. "/". basename($files['files']['name'][$i]))){
+				$name = explode('.', basename($files['files']['name'][$i]));
+				echo "<div class=\"element\" id=\"$name[0]_$name[1]\"><div class=\"folderIcon\"><img src=\"server/img/file.svg\"><div class=\"name\">$name[0].$name[1]</div></div></div>";
+			}
+		}
+	}
 
 }
 
