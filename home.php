@@ -1,6 +1,3 @@
-<?php
-if (isset($_SESSION)) {return header('location: index.html');}
-?>
 
 <!DOCTYPE html>
 <html>
@@ -11,6 +8,12 @@ if (isset($_SESSION)) {return header('location: index.html');}
 </head>
 <!--<body id="home" onselectstart="return false">-->
 <body id="home">
+<?php
+
+session_start();
+if (!isset($_SESSION['path'])) return header('location: index.html');
+
+?>
 <header>
 		<nav>
 			<div class="option" id="comprimir">

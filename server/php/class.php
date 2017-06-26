@@ -24,11 +24,14 @@ class REGISTRO{
 			$ids[] = $fila['id_users'];
 		}
 		
+		//return (isset($_SESSION['path'])) ? true: false;
+
 		if (count($ids) > 1)
 			return ($ids[0] === $ids[1]) ? true : false;
 		else
 			return false;    	
 	}
+
 	public function exit(){
 		session_destroy();
 		return true;
@@ -161,7 +164,7 @@ class SYSTEM{
 	private function copyFiles($source, $dest){
 		$name = explode('/', $source);
 		$name = $name[count($name)-1];
-		echo "<br>source->$source<br>dest->$dest<br>";
+		//echo "<br>source->$source<br>dest->$dest<br>";
 		if (is_file($source))
 			copy($source, "$dest/$name");
 		elseif (is_dir($source)) {
@@ -175,9 +178,9 @@ class SYSTEM{
 	}
 
 	public function removeDir($path){
-		echo "<br>path->$path<br>";
+		//echo "<br>path->$path<br>";
 		if (is_file($path))
-			echo (unlink($path))? "Se ha borrado el archivo $path": "No se ha borrado el archivo $path";
+			unlink($path);
 		elseif (is_dir($path)){
 			$f = array_diff(scandir($path), ['.','..']);
 			foreach ($f as $key ) {

@@ -1,7 +1,8 @@
 var w = window.innerWidth
 	h = window.innerHeight,
 	mainColor = '#00edff20',
-	add = false;
+	add = false,
+	multiple = false;
 /*
 *Primero se cargan en main todos los elementos y se
 guardan en la estructura del main en home.html
@@ -20,6 +21,7 @@ Array.prototype.getIndex = function(str) {
 function SYSTEM(){
 	this.selected = [];
 	this.selectedName = [];
+	this.pos = [];
 	this.load = function() {
 		/*
 		*Con está función se pretende "pedir" al servidor todas
@@ -49,6 +51,7 @@ function SYSTEM(){
 		}
 	}
 	this.select = function(el){
+		console.log(el)
 		var id = el.attr('id');
 		var index = this.selected.getIndex(id);
 		if (index === false){
@@ -65,6 +68,7 @@ function SYSTEM(){
 		this.selected = [];
 		this.selectedName = [];
 		$('.element').removeAttr('style').find('.name').removeAttr('style');
+		this.pos = [];
 	}
 
 	this.changeName = function(){
@@ -76,7 +80,6 @@ function SYSTEM(){
 	}
 	
 	this.exitChangeName = function(newName){
-		alert('numero de veces que entra')
 		$('body').removeAttr('onselectstart');
 		newName.parent().parent().attr('id', newName.html());
 		$('.name').css({'border': 'none'}).removeAttr('contenteditable');
@@ -106,7 +109,7 @@ function SYSTEM(){
 		for (var i = 0; i<this.selected.length; i++){
 			names.push($('#' + this.selected[i]).find('.name').html());
 		}
-		$.post('server/php/proccess.php', {'function': 'download', 'names': names}, function(d){$('body').html(d)});
+		$.post('server/php/proccess.php', {'function': 'download', 'names': names}, function(d){$('head').append(d)});
 		//location.href = 'server/php/descarga.php?names='+names[0]
 	}
 	this.upLevel = function() {
@@ -143,7 +146,7 @@ function SYSTEM(){
 
 	this.load();
 }
-
+/*
 function ELEMENT(id) {
 	this.x = 0;
 	this.y = 0;
@@ -156,7 +159,7 @@ function ELEMENT(id) {
 		this.y = offset.top;
 	}
 	this.loadElem()
-}
+}*/
 var sys = new SYSTEM();
 function loadElemts() {
 	var id = '',
@@ -173,14 +176,33 @@ function loadElemts() {
 
 
 $('body').on('click', '.folderIcon', function(){
-	(!add ) ? 
+	/*(!add ) ? 
 		sys.selectOne($(this).parent()) : 
-		sys.select($(this).parent()) ;
+		sys.select($(this).parent()) ;*/
+
+	if (add)
+		sys.select($(this).parent())		
+	else{
+		if (multiple){
+			var element = $('.element');
+			sys.select($(this).parent());
+			sys.pos.push($(this).parent().index('.element'));
+			console.log(sys.pos)
+			if (sys.pos.length >1){
+				for (var i = sys.pos[0]+1; i< sys.pos[sys.pos.length-1]; i++){
+					console.log(i)
+					sys.select($(element[i]));
+				}
+			}
+		}
+		else
+			sys.selectOne($(this).parent());
+	}
 });
 
 $(document).on('keyup keydown', function(e){
-	if (!e.shiftKey) return;
-	sys.select($(this));
+	if (e.shiftKey) return;
+		multiple = true;
 });
 
 $('body').on('dblclick', '.folderIcon', function(){
@@ -238,6 +260,7 @@ $(document).keydown(function(e){
 	var key = e.which;
 	switch (key) {
 		case 16: // sifth
+		multiple = true;
 			break;
 		case 17: // ctrl
 			add = true;
@@ -252,7 +275,7 @@ $(document).keydown(function(e){
 			console.log(e.which );
 			break;		
 	}
-}).keyup(function(e){add = false;});
+}).keyup(function(e){add = false; multiple = false;});
 
 $('main').css({'height': h*0.8});
 $('header').css({'height': w*0.06});
