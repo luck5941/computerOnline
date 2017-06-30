@@ -1,6 +1,7 @@
 <?php
 include 'class.php';
 $sys = new SYSTEM($_SESSION['path']);
+$user = new REGISTRO();
 
 if (isset($_POST['function'])){
 	$function = $_POST['function'];
@@ -20,6 +21,9 @@ if (isset($_POST['function'])){
 			break;
 		case 'download':
 			echo $sys->download($_POST['names']);
+			break;
+		case 'changeTheme':
+			$user->changeTheme($_POST['theme']);
 			break;
 		default:
 			echo $function;

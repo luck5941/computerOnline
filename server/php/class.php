@@ -9,27 +9,168 @@ session_start();
 if (!isset($_SESSION['path']))
 	$_SESSION['path'] = '../..';
 
-//$sql = mysqli_connect(HOST, USER_DB, PASSWD, NAME_BD);
+$sql = mysqli_connect(HOST, USER_DB, PASSWD, NAME_BD);
 
 class REGISTRO{
+	private $id;
+	private $turn;
+	private $str = "abcC7EU/yQ,3o9L1WYrmfRK4VM-BA0nx;jDlHPSh*X+J\pgGkd6IzZN2TÑtvswqFOeu:i85";
+	public function __construct() {
+		$this->id = (isset($_SESSION['id'])) ? $_SESSION['id'] : '';
+	}
+
 	public function login($user, $pssw){
 		global $sql;
-		$check =  mysqli_query($sql, "SELECT id_users from usuarios where user='$user'");
+		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where users='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
+			$turn = $fila['turn'];
 		}
-		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd1='$pssw'");				
+		echo $turn; 
+		$i = 0;
+		$psswrd = $pssw;
+		$this->turn = $this->uncryptNum($turn);
+		echo "<br>" . $this->turn . "<br>"; 
+		for (;$i<=$this->turn; $i++){
+			$psswrd = sha1(md5($psswrd));
+		}
+		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 		}
-		
+		echo count($ids); 
 		//return (isset($_SESSION['path'])) ? true: false;
-
-		if (count($ids) > 1)
+		
+		if (count($ids) > 1){
+			$_SESSION['id'] = $ids[0];
 			return ($ids[0] === $ids[1]) ? true : false;
+		}
 		else
-			return false;    	
+			return false;    
+			
+	}
+
+	public function loadStyle() {
+		global $sql;
+		$check =  mysqli_query($sql, "SELECT theme from usuarios where id_users='$this->id'");
+		while ($fila = mysqli_fetch_assoc($check)) {
+			$theme = $fila['theme'];
+		}
+		switch ($theme) {
+			case 'default':
+				$style = ":root{--firstColor: #DFFCFF;--secondColor: #00C9CE;--thirdColor: #80c1c3;}";
+				break;
+			case 'earth':
+				$style = ":root{--firstColor: #f2eaca;--secondColor: #f2db82;--thirdColor: #c67a09;}";
+				break;
+			case 'green':
+				$style = ":root{--firstColor: #bef9d8;--secondColor: #82f297;--thirdColor: #48b486;}";
+				break;
+		}
+		return $style;
+	}
+
+
+	public function changeTheme($theme) {
+		$this->updateDatabase(['theme' => $theme]);
+	}
+
+	public function newUser($userName, $pssword1, $psswrd2, $mail){
+		global $sql;
+		if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
+		if ($pssword1 !== $psswrd2) return "Las contraseñas no coinciden";
+		$this->turn = mt_rand(0, pow(10, 6));
+		$bin = $this->cryptNum($this->turn);
+		$i = 0;
+		$psswrd = $pssword1;
+		for (;$i<=$this->turn; $i++){
+			$psswrd = sha1(md5($psswrd));
+		}
+		echo "<br>INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '$psswrd', '$mail', 'default', '$bin')<br>";
+		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '$psswrd', '$mail', 'default', '$bin')")) ? "Registro con exito": "Vaya algo ha ido mal";
+		echo "<br>psswrd-> $psswrd<br>bin-> $bin<br>turn-> $this->turn";
+	}
+
+	private function cryptNum($num){
+		$str = $this->str;
+		$bin = '';
+		$binDef = '';
+		$len = strlen($str);
+		while ($num>=$len) {
+			$tmp = intval($num % $len);
+			$bin .= $str[$tmp];
+			$num =  intval($num/$len);
+		}
+		$tmp = mt_rand(0, strlen($bin)-1);
+		echo $tmp;
+		for ($i=0;$i<strlen($bin); $i++){
+			if($i ==$tmp){
+				$binDef .= "." . $str[$num];
+				echo "<br>Coincide<br>";
+			}
+			$binDef .= $bin[$i];
+		}
+		return $binDef;
+	}
+
+	private function uncryptNum($str){
+		$arr = explode('.', $str);
+		$arr[0] .= substr($arr[1], 1);
+		$i = strlen($arr[0])-1;
+		$mult = strlen($this->str);
+		$tmp = 0;
+		for (; $i>=0; $i--){
+			$tmp = ($tmp == 0) ? ($mult*strpos($this->str, $arr[1][0])+strpos($this->str, $arr[0][$i])) : ($mult*$tmp+strpos($this->str, $arr[0][$i]));
+		}
+		return $tmp;
+	}
+
+	/*
+		private function findNum($str, $chr){
+			for ($i =0; $i<strlen($str); $i++){
+				if ($str[$i] === $chr)
+					return $i;
+			}
+		}
+		private function cryptNum($num){
+			$tmpBin = '';
+			$bin = '';
+			$i;
+			while ($num>=1){
+				$tmpBin .= strval($num%2);
+				$num = $num/2;
+			}
+			echo "tmpBin-> $tmpBin<br>";
+			$i = strlen($tmpBin)-1;
+			echo "i vale: $i<br>";
+			while ( $i>= 0) {
+				$bin .= $tmpBin[$i];
+				$i--;
+			 }
+
+
+			return $bin;
+		}
+
+		private function uncryptNum($num){
+			$power = 0;
+			$decimal = 0;
+			while ($num != 0) {
+				$lstDigit = $num%10;
+				$decimal += $lstDigit * pow(2, $power);
+				$power++;
+				$num = $num/10;
+			}
+			return $decimal;
+		}
+	*/
+	private function updateDatabase ($values){
+		global $sql;
+		foreach ($values as $key => $value) {
+			mysqli_query($sql, "update usuarios set $key='$value' where id_users = $this->id");
+		}
+
 	}
 
 	public function exit(){
@@ -80,7 +221,8 @@ class SYSTEM{
 			return $this->main;
 		
 	}
-	
+
+
 	public function changeName($name) {
 		echo "\nchangeName en  classPHP\nname=$name[0]\n";
 		if (is_dir("$this->path/$name[0]") || is_file("$this->path/$name[0]")){
