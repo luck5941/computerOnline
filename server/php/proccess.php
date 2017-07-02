@@ -25,8 +25,14 @@ if (isset($_POST['function'])){
 		case 'changeTheme':
 			$user->changeTheme($_POST['theme']);
 			break;
+		case 'changeNameUser':
+			echo $user->changeName($_POST['user'], $_POST['newUser']);
+			break;
+		case 'changePssword':
+			echo $user->changePssword($_POST['pssword'], $_POST['newUser'], $_POST['newUser2']);
+			break;
 		default:
-			echo $function;
+			echo "$function <- default";
 			break;
 	}
 }

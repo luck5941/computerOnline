@@ -5,6 +5,13 @@ body#index{width: 300%;}
 body#home{background-color: var(--firstColor)}
 img, svg {width: 100%;}
 
+
+#user{
+	width: 5%;
+	padding: 2%;
+}
+
+
 #index section{
 	width: 33.3%;
 }

@@ -35,7 +35,7 @@ session_start();
 <div id="login" class="forms">
 <div class="init">Tienes que inicar sesión para continuar</div>
 <form action="server/php/registro.php" method="POST">
-	<p>Nombre de usuario: </p><input class="input" type="password" name="user">
+	<p>Correo electronico: </p><input class="input" type="password" name="user">
 	<p>Contraseña: </p><input class="input" type="password" name="pssword1">
 	<input style="display: none" name="function" value="login">
 	<div><input type="submit" value="Enviar"></div>
@@ -65,6 +65,7 @@ session_start();
 </section>
 
 <script type="text/javascript" src="server/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="server/js/main.js"></script>
 <script type="text/javascript" src="server/js/index.js"></script>
 </div>
 </body>

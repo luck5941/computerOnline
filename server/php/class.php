@@ -21,13 +21,13 @@ class REGISTRO{
 
 	public function login($user, $pssw){
 		global $sql;
-		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where users='$user'");
+		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where mail='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 			$turn = $fila['turn'];
 		}
-		echo $turn; 
+		echo $turn;
 		$i = 0;
 		$psswrd = $pssw;
 		$this->turn = $this->uncryptNum($turn);
@@ -35,6 +35,7 @@ class REGISTRO{
 		for (;$i<=$this->turn; $i++){
 			$psswrd = sha1(md5($psswrd));
 		}
+		echo "<br>"."SELECT id_users from usuarios where psswrd='$psswrd'"."<br>";
 		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
@@ -44,12 +45,42 @@ class REGISTRO{
 		
 		if (count($ids) > 1){
 			$_SESSION['id'] = $ids[0];
+			$_SESSION['turn'] = $turn;
 			return ($ids[0] === $ids[1]) ? true : false;
 		}
 		else
 			return false;    
 			
 	}
+
+	public function changePssword($oldPssword, $newPssword, $newPssword2){
+		global $sql;
+		if ($newPssword == $newPssword2){
+			$this->turn = $this->uncryptNum($_SESSION['turn']);
+			$psswrd = $oldPssword;
+			for ($i=0;$i<=$this->turn; $i++){
+				$psswrd = sha1(md5($psswrd));
+			}
+			$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
+			while ($fila = mysqli_fetch_assoc($check)) {
+				$id = $fila['id_users'];
+			}
+			if (isset($id)){
+				if ($id == $_SESSION['id']){
+					$psswrdCryp = $this->crypPassword($newPssword);
+					return (mysqli_query($sql, "UPDATE usuarios set psswrd='".$psswrdCryp['psswrd']."', turn = '".$psswrdCryp['bin']."' where id_users= $id")) ? "Se ha cambiado correctamente" : "Fallo en el proceso";
+				}
+				else
+					return "Vaya, parece que la contraseña no coincide con la nuestra";
+			}
+			else
+				return "Vaya, parece que la contraseña no coincide con la nuestra";
+
+		}
+		else
+			return "las contraseñas no coinciden";
+	}
+
 
 	public function loadStyle() {
 		global $sql;
@@ -71,6 +102,23 @@ class REGISTRO{
 		return $style;
 	}
 
+	public function changeName($oldName, $newName){
+		global $sql;
+		$check = mysqli_query($sql, "SELECT id_users, turn from usuarios where users='$oldName'");
+		while ($fila = mysqli_fetch_assoc($check)) {
+			$id = $fila['id_users'];
+		}
+		if ($id == $_SESSION['id']){
+			if (mysqli_query($sql, "UPDATE usuarios set users='$newName' where id_users= $id")){
+				rename("../img/$oldName", "../img/$newName");
+				return "Proceso completado con exito";
+			}
+			else
+				return "Ha habido un fallo en el proceso";
+			}
+		else
+			return "Ha habido un fallo en el proceso";
+	}
 
 	public function changeTheme($theme) {
 		$this->updateDatabase(['theme' => $theme]);
@@ -80,18 +128,22 @@ class REGISTRO{
 		global $sql;
 		if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
 		if ($pssword1 !== $psswrd2) return "Las contraseñas no coinciden";
-		$this->turn = mt_rand(0, pow(10, 6));
-		$bin = $this->cryptNum($this->turn);
-		$i = 0;
-		$psswrd = $pssword1;
-		for (;$i<=$this->turn; $i++){
-			$psswrd = sha1(md5($psswrd));
-		}
-		echo "<br>INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '$psswrd', '$mail', 'default', '$bin')<br>";
-		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '$psswrd', '$mail', 'default', '$bin')")) ? "Registro con exito": "Vaya algo ha ido mal";
+		$psswrdCryp = $this->crypPassword($pssword1);
+		echo "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')";
+		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')")) ? "Registro con exito": "Vaya algo ha ido mal";
 		echo "<br>psswrd-> $psswrd<br>bin-> $bin<br>turn-> $this->turn";
 	}
 
+	private function crypPassword($psswrd){
+		$this->turn = mt_rand(0, pow(10, 6));
+		$bin = $this->cryptNum($this->turn);
+		$i = 0;
+		$psswrd = $psswrd;
+		for (;$i<=$this->turn; $i++){
+			$psswrd = sha1(md5($psswrd));
+		}
+		return ['bin'=>$bin, 'psswrd'=>$psswrd];
+	}
 	private function cryptNum($num){
 		$str = $this->str;
 		$bin = '';
@@ -103,11 +155,11 @@ class REGISTRO{
 			$num =  intval($num/$len);
 		}
 		$tmp = mt_rand(0, strlen($bin)-1);
-		echo $tmp;
+		//echo $tmp;
 		for ($i=0;$i<strlen($bin); $i++){
 			if($i ==$tmp){
 				$binDef .= "." . $str[$num];
-				echo "<br>Coincide<br>";
+				//echo "<br>Coincide<br>";
 			}
 			$binDef .= $bin[$i];
 		}

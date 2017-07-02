@@ -11,6 +11,7 @@ switch ($function){
 			return header('location: ../../home.php');
 		else{
 			$_SESSION['error_1'] = 'Fallo en la autentificación';
+			echo '<br>Fallo en la autentificación';
 			return header('location: ../../index.php');
 		}
 		break;
@@ -22,7 +23,7 @@ switch ($function){
 		$answer = $user->newUser($userName, $pssword1, $pssword2, $mail);
 		$_SESSION['error_2'] = $answer;
 		echo $answer;
-		return header('location: ../../index.php#newUser');
+		//return header('location: ../../index.php#newUser');
 		break;
 	case 'exit':
 		$user->exit();
