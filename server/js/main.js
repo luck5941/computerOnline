@@ -5,6 +5,7 @@ h = window.innerHeight,
 	multiple = false,
 	page = (location.href.search('home') !== -1),
 	nivel = (page) ? 0 : 1,
+	searchClick = true,
 	section = $('section'),
 	liftButton = $('.liftButton');
 /*
@@ -131,6 +132,8 @@ function SYSTEM() {
 			});
 		}
 
+		upload.uploadFile(data);
+		/*
 		$.ajax({
 			url: "server/php/proccess.php",
 			type: 'POST',
@@ -143,7 +146,8 @@ function SYSTEM() {
 			error: function(xhr, ajaxOptions, thrownError) {
 				console.log(xhr + "\n" + ajaxOptions + "\n" + thrownError);
 			}
-		})
+		});
+		*/
 	}
 
 	this.changeTheme = function(theme) {
@@ -152,6 +156,48 @@ function SYSTEM() {
 
 	this.load();
 }
+
+function UPLOAD() {
+	this.uploadFile = function(d) {
+		$('#progress').css('display', 'block');
+		var xhr = new XMLHttpRequest();
+		xhr.upload.addEventListener("progress", this.uploadProgress, false);
+		xhr.addEventListener("load", this.uploadComplete, false);
+		xhr.addEventListener("error", this.uploadFailed, false);
+		xhr.addEventListener("abort", this.uploadCanceled, false);
+		xhr.open("POST", "server/php/proccess.php");
+		xhr.send(d);
+	}
+
+	this.uploadProgress = function(e) {
+		if (e.lengthComputable) {
+			console.log(e);
+			var percentComplete = Math.round(e.loaded * 100 / e.total),
+				percent = (parseInt($('#progressBarCont').attr('width')) - 2) * percentComplete / 100;
+			$('#progressBar').attr('width', percent);
+
+
+		} else {
+			console.log('unable to compute');
+		}
+	}
+	this.uploadComplete = function(evt) {
+		/* This event is raised when the server send back a response*/
+		$('main').append('evt.target.responseText' + evt.target.responseText);
+		$('#progress').css('display', 'none');
+	}
+
+	this.uploadFailed = function(evt) {
+		console.log("There was an error attempting to upload the file.");
+	}
+
+	this.uploadCanceled = function(evt) {
+		console.log("The upload has been canceled by the user or the browser dropped the connection.");
+	}
+
+}
+
+
 /*
 function ELEMENT(id) {
 	this.x = 0;
@@ -167,6 +213,7 @@ function ELEMENT(id) {
 	this.loadElem()
 }*/
 var sys = new SYSTEM();
+var upload = new UPLOAD();
 
 function loadElemts() {
 	var id = '',
@@ -259,7 +306,24 @@ $('#añadir').click(function() {
 	sys.newFolder();
 });
 
-$('#exit').click(function(e) { sys.exit(); })
+$('#exit').click(function(e) { sys.exit(); });
+
+$('#search').click(function(e) {
+	if (e.target.nodeName.toLowerCase() !== 'circle') return;
+	searchClick = false;
+	$('#section').animate({ 'height': '80vh', 'margin-top': '15vh' }, 1000);
+	console.log('entra')
+	$('#search svg').children().animate({ 'opacity': 0 }, 1000);
+	await sleep(1000)
+	$('#search svg').css('display', 'none');
+	$('#search').css({ 'opacity': 0, 'height': '4vw' });
+	$('#search').animate({ 'opacity': 1 }, 800);
+	$('#search').animate({ 'width': '20%' }, 1000);
+	$('#searching').attr('editableContent', 'true').html('Search').removeAttr('style');
+
+	$('#search').append('<div id="searching"></div>').find('#searching').css('height', '100%');
+
+});
 
 
 $('#descargar').click(function(e) { sys.download(); });
@@ -391,13 +455,13 @@ $('#home .forms').submit(function(e) {
 		$this = $(this),
 		input = $this.find('input');
 
-	for (var i = 0; i < input.length-1; i++) {
-		eval('obj.'+$(input[i]).attr('name') + ' = "'+$(input[i]).val() +'"')
+	for (var i = 0; i < input.length - 1; i++) {
+		eval('obj.' + $(input[i]).attr('name') + ' = "' + $(input[i]).val() + '"')
 	}
 	console.log($this.find('form').attr('action'));
-	$.post($this.find('form').attr('action'), obj, function(d){
+	$.post($this.find('form').attr('action'), obj, function(d) {
 		console.log(d)
-		$this.append('<div>'+d+'</div>');
+		$this.append('<div>' + d + '</div>');
 
 	})
 	console.log(obj);

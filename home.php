@@ -10,11 +10,11 @@ include 'server/php/class.php';
 if (!isset($_SESSION['id'])) return header('location: index.html');
 $usr = new REGISTRO();
 ?>
-	<style type="text/css">
-	<?=$usr->loadStyle();
-	?>
-	</style>
-	<link rel="stylesheet" type="text/css" href="server/css/style.css">
+		<style type="text/css">
+		<?=$usr->loadStyle();
+		?>
+		</style>
+		<link rel="stylesheet" type="text/css" href="server/css/style.css">
 </head>
 
 <body id="home" onselectstart="return false">
@@ -65,14 +65,13 @@ $usr = new REGISTRO();
 				</div>
 			</nav>
 		</header>
-		<main id="lavel">
-		</main>
+		<main id="lavel"></main>
 	</div>
 	<form action="server/php/registro.php" method="POST">
 		<input name="function" type="submit" value="exit" />
 	</form>
 	<form id="fileupload" enctype="multipart/form-data" action="server/php/proccess.php" method="POST">
-		<input type="hidden" name="MAX_FILE_SIZE" value="500000000" />
+		<input type="hidden" name="MAX_FILE_SIZE" value="1000000000" />
 		<input type="file" id="files" name="files[]" multiple class="toCanvas" value="" />
 		<input type="submit" value="Enviar fichero" id="submit" />
 	</form>
@@ -150,6 +149,14 @@ $usr = new REGISTRO();
 			<line y1=30 x1=70 y2=70 x2=30 class="line" />
 		</svg>
 	</div>
+
+	<div id="search" class="button">
+		<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+			<circle cx="50" cy="50" r="30" class="line" />
+			<line x1=73  y1=73  x2=90 y2=90 class="line" />
+		</svg>
+	</div>
+
 	<div id=ancla class="button">
 		<svg viewBox="0 0 100 100" preserveAspectRatio="none">
 			<circle cx="50" cy="50" r="45" class="line" />
@@ -162,6 +169,14 @@ $usr = new REGISTRO();
 		<div class="liftButton">-1</div>
 		<div class="liftButton">-2</div>
 		<div class="liftButton">-3</div>
+	</div>
+	<div id="progress">
+		SUBIDO
+		<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+			<rect x="5" y="1" width="90" height="15" fill="white" />
+			<rect x="7.5" y="3.5" width="85" height="10" fill="none" stroke="var(--secondColor)" stroke-width="1" id="progressBarCont" />
+			<rect x="8.5" y="4.5" width="83" height="8" id="progressBar">
+		</svg>
 	</div>
 	<script type="text/javascript" src="server/js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="server/js/main.js"></script>
