@@ -1,3 +1,10 @@
+@keyframes load {
+    0%   {transform: rotate(0, 50,  50);}
+    100%   {transform: rotate(360, 50,  50);}
+}
+
+
+
 
 body {margin: 0; overflow: hidden;}
 *{font-family: sans-serif;}
@@ -166,7 +173,19 @@ header {
 }
 
 #searching{
+	border: none;
 	border-bottom: 3px solid var(--secondColor);
+	background-color: inherit;
+	margin-top: 6%;
+}
+#searching::-webkit-input-placeholder { /*chrome*/
+color: var(--secondColor);
+}
+#searching::-moz-placeholder { /*FF 4-18*/
+color: var(--secondColor);
+}
+#searching::-moz-placeholder { /*FF 19++*/
+color: var(--secondColor);
 }
 
 #lift{
@@ -331,5 +350,60 @@ section:nth-child(2n+1) {
 }
 #progress svg {
 	width: 90%;
-	//background-color: white;
+	/*background-color: white;*/
 }	
+
+#contSearch{
+	width: 100%;
+	border-top: 5px solid var(--secondColor);
+	float: left;
+}
+
+#contSearch .list {
+	width: 100%;
+	float: left;
+	padding: 2% 0;
+}
+#contSearch .list:nth-child(2n+1){
+	background: var(--thirdColor);
+}
+
+#contSearch .icon{
+	width: 5%;
+	float: left;
+	margin: 0 5%;
+}
+#contSearch .name {
+	float: left;
+}
+#contSearch .path {
+	float: right;
+	margin: 0 5%;
+}
+
+/*
+#carga {
+	position: absolute;
+	width: 60%;
+	margin: 8% 20%;
+	background-color: #00000030;
+	box-shadow: 5px 5px 5px var(--secondColor);
+}
+
+
+
+
+
+#carga svg {
+	width: 75%;
+	margin: 0 12.5%;
+
+}
+#carga svg g {
+  transform-origin: right bottom;
+  transform:
+    rotate(90deg)
+    translate(0, -100%) 
+    rotate(90deg)
+    translate(0, 100%);
+}*/

@@ -3,11 +3,18 @@ h = window.innerHeight,
 	mainColor = '#00edff20',
 	add = false,
 	multiple = false,
+	enviar = true,
 	page = (location.href.search('home') !== -1),
 	nivel = (page) ? 0 : 1,
 	searchClick = true,
 	section = $('section'),
 	liftButton = $('.liftButton');
+
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /*
 *Primero se cargan en main todos los elementos y se
 guardan en la estructura del main en home.html
@@ -308,20 +315,20 @@ $('#añadir').click(function() {
 
 $('#exit').click(function(e) { sys.exit(); });
 
-$('#search').click(function(e) {
+$('#search').click(async function(e) {
 	if (e.target.nodeName.toLowerCase() !== 'circle') return;
 	searchClick = false;
 	$('#section').animate({ 'height': '80vh', 'margin-top': '15vh' }, 1000);
 	console.log('entra')
-	$('#search svg').children().animate({ 'opacity': 0 }, 1000);
-	await sleep(1000)
+	$('#search *').children().animate({ 'opacity': 0 }, 500);
+	await sleep(500)
 	$('#search svg').css('display', 'none');
 	$('#search').css({ 'opacity': 0, 'height': '4vw' });
-	$('#search').animate({ 'opacity': 1 }, 800);
-	$('#search').animate({ 'width': '20%' }, 1000);
-	$('#searching').attr('editableContent', 'true').html('Search').removeAttr('style');
-
-	$('#search').append('<div id="searching"></div>').find('#searching').css('height', '100%');
+	$('#search').animate({ 'opacity': 1 }, 400);
+	await sleep(400)
+	$('#search').animate({ 'width': '20%' }, 500);
+	$('#search').append('<input id="searching" placeholder="search"></input>').find();
+	$('#searching').attr('contenteditable', 'true').html('Search').removeAttr('style').css('font-size', '25pt');
 
 });
 
@@ -467,6 +474,27 @@ $('#home .forms').submit(function(e) {
 	console.log(obj);
 
 });
+
+$('#home').on('input', '#searching', function(e){
+	var val = this.value;
+	if($('#lavel').html().search('contSearch') == -1) 
+	$('#lavel').append('<div id="contSearch"></div>')
+	console.log(val)
+	if (enviar)
+	$.post('server/php/proccess.php', {'function': 'search', 'val': val})
+	.done(function(d){
+		$('#contSearch').html(d);
+		enviar = true;
+		})
+	.fail(function(xhr, status, error){
+		enviar = true;
+		console.log(xhr)
+		/*console.log(status)
+		console.log(error)*/
+	});
+	enviar = false;
+});
+
 
 
 

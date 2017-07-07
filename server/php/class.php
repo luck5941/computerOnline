@@ -239,6 +239,7 @@ class SYSTEM{
 	private $main = '';
 	private $pathToSee = '';
 	private $zip = '';
+	private $find = [];
 
 	public function __construct($path) {
 		$this->path = $path;
@@ -391,6 +392,52 @@ class SYSTEM{
 				echo "<div class=\"element\" id=\"$name[0]_$name[1]\"><div class=\"folderIcon\"><img src=\"server/img/file.svg\"><div class=\"name\">$name[0].$name[1]</div></div></div>";
 			}
 		}
+	}
+
+	private function findInside($str, $path){
+		$files = array_diff(scandir($path), ['.', '..', '.git', 'server']);
+		foreach ($files as $file) {
+			if (strpos($file, $str) !== false){
+				if (!isset($this->find[$path])){
+					$this->find[$path] = [];
+					//echo "no existe y ahora si";
+				}
+				$this->find[$path][] = $file;
+			}
+			if (is_dir("$path/$file"))
+				//echo "is dir_ $path/$file";
+				$this->findInside($str, "$path/$file");
+		}
+		
+	}
+
+
+	public function search($str){
+		if (strpos($str, '/')!== false){
+			$path = '../..';
+			$str = substr($str, 1);
+		}
+		else
+			$path = $_SESSION['path'];
+		if ($str == '') return;
+		$this->findInside($str, $path);
+		//print_r($this->find);
+
+		foreach ($this->find as $key => $value) {
+			foreach ($value as $subKey => $subValue) {
+				// echo "\n$key contiente  $subValue\n";
+				$icon = is_dir("$key/$subValue") ? "folder" : "file";
+				echo "<div class=\"list\">
+						<div class=\"icon\">
+							<img  src=\"server/img/$icon.svg\">
+						</div>
+						<div class=\"name\">$subValue</div>
+						<div class=\"path\">".substr($key, 5)."</div>
+					</div>";
+
+			}
+		} 
+
 	}
 
 }

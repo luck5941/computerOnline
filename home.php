@@ -178,6 +178,17 @@ $usr = new REGISTRO();
 			<rect x="8.5" y="4.5" width="83" height="8" id="progressBar">
 		</svg>
 	</div>
+<!-- <div id="carga">
+	<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+		<g >
+		<path d="M10 0 A 45 45 -1 1 1 20 50" class="line"/>
+			<!-- <circle cx=50 cy=50 r=25 /> 
+
+
+		</g>
+	</svg>
+</div> -->
+
 	<script type="text/javascript" src="server/js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="server/js/main.js"></script>
 </body>
