@@ -249,7 +249,7 @@ class SYSTEM{
 			if ($folder == '')
 				$this->path = $_SESSION['path'];
 			else
-				$this->path .= "/$folder";
+				$this->path = (strpos('/', $folder) === false) ? $this->path . "/$folder": "pepe/$folder";
 			if ($this->path !== '../..'){
 				$this->pathToSee = str_replace('../../', '', $this->path);
 				$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><img src=\"server/img/upLevel.svg\"></div><div id=\"path\">$this->pathToSee</div></div>";
@@ -422,10 +422,12 @@ class SYSTEM{
 		if ($str == '') return;
 		$this->findInside($str, $path);
 		//print_r($this->find);
-
+		echo "<div class=\"group\">";
+		$i = 0;
 		foreach ($this->find as $key => $value) {
 			foreach ($value as $subKey => $subValue) {
 				// echo "\n$key contiente  $subValue\n";
+				$i++;
 				$icon = is_dir("$key/$subValue") ? "folder" : "file";
 				echo "<div class=\"list\">
 						<div class=\"icon\">
@@ -434,9 +436,11 @@ class SYSTEM{
 						<div class=\"name\">$subValue</div>
 						<div class=\"path\">".substr($key, 5)."</div>
 					</div>";
-
+				if ($i%6 == 0)
+					echo "</div><div class=\"group\">";
 			}
-		} 
+		}
+		echo "</div>";
 
 	}
 

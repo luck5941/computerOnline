@@ -177,15 +177,19 @@ header {
 	border-bottom: 3px solid var(--secondColor);
 	background-color: inherit;
 	margin-top: 6%;
+	color: var(--secondColor);
 }
 #searching::-webkit-input-placeholder { /*chrome*/
-color: var(--secondColor);
+	opacity: 0.5;
+	color: var(--secondColor);
 }
 #searching::-moz-placeholder { /*FF 4-18*/
-color: var(--secondColor);
+	opacity: 0.5;
+	color: var(--secondColor);
 }
 #searching::-moz-placeholder { /*FF 19++*/
-color: var(--secondColor);
+	opacity: 0.5;
+	color: var(--secondColor);
 }
 
 #lift{
@@ -357,28 +361,43 @@ section:nth-child(2n+1) {
 	width: 100%;
 	border-top: 5px solid var(--secondColor);
 	float: left;
+	display: flex;
+	flex-wrap: wrap;
 }
 
+
+#contSearch .group {
+	/*float: left;*/
+	flex: 1;
+	max-width: 20%;
+}
 #contSearch .list {
 	width: 100%;
 	float: left;
 	padding: 2% 0;
+	border-right: 0.5px solid;
+	border-bottom: 0.5px solid;
+	font-size: 10pt;
 }
-#contSearch .list:nth-child(2n+1){
+#contSearch .group:nth-child(2n) .list:nth-child(2n){
+	background: var(--thirdColor);
+}
+
+#contSearch .group:nth-child(2n+1) .list:nth-child(2n+1){
 	background: var(--thirdColor);
 }
 
 #contSearch .icon{
-	width: 5%;
+	width: 25%;
 	float: left;
-	margin: 0 5%;
+	margin: 0 32.5%;
 }
 #contSearch .name {
-	float: left;
+	/*float: left;*/
 }
 #contSearch .path {
-	float: right;
-	margin: 0 5%;
+	/*float: right;
+	margin: 0 5%;*/
 }
 
 /*

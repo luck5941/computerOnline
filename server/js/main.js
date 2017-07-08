@@ -5,10 +5,10 @@ h = window.innerHeight,
 	multiple = false,
 	enviar = true,
 	page = (location.href.search('home') !== -1),
-	nivel = (page) ? 0 : 1,
 	searchClick = true,
 	section = $('section'),
 	liftButton = $('.liftButton');
+	if (page) var nivel = 0;
 
 
 function sleep(ms) {
@@ -62,7 +62,6 @@ function SYSTEM() {
 		}
 	}
 	this.select = function(el) {
-		console.log(el)
 		var id = el.attr('id');
 		var index = this.selected.getIndex(id);
 		if (index === false) {
@@ -107,6 +106,7 @@ function SYSTEM() {
 
 	this.openFolder = function(name) {
 		$.post('server/php/proccess.php', { 'function': 'openDirectory', 'name': name }, function(d) {
+			console.log(d)
 			$('main').html(d);
 		});
 	}
@@ -254,16 +254,25 @@ function horiziontal(direccion) {
 	if (nivel == -1) nivel = 0;
 	if (nivel == 3) nivel = 2;
 	$('body, html').animate({ 'scrollLeft': $(section[nivel]).offset().left }, 750);
+	switch(nivel) {
+		case 0:
+			var hash = 'forget';
+			break;
+		case 1:
+			var hash = 'login';
+			break;
+		case 2:
+			var hash = 'newUser';
+			break;
+
+	}
+	location.hash = hash;
 }
 
 
 
 
 $('body').on('click', '.folderIcon', function() {
-	/*(!add ) ? 
-		sys.selectOne($(this).parent()) : 
-		sys.select($(this).parent()) ;*/
-
 	if (add)
 		sys.select($(this).parent())
 	else {
@@ -283,16 +292,25 @@ $('body').on('click', '.folderIcon', function() {
 	}
 });
 
+$('body').on('dblclick', '', function(){
+	sys.selectOne($(this));
+});
+
+
+
+
+
 $(document).on('keyup keydown', function(e) {
 	if (e.shiftKey) return;
 	multiple = true;
 });
 
-$('body').on('dblclick', '.folderIcon', function() {
+$('body').on('dblclick', '.folderIcon, .list', function(e) {
 	if ($(this).parent().attr('id') == 'upLevel') return;
-	var id = $(this).find('.name').html();
+	console.log(e.currentTarget.className)
+	var id = (e.currentTarget.className == 'folderIcon') ? $(this).find('.name').html() : $(this).find('.path').html();
 	console.log(id);
-	sys.openFolder(id);
+	return ($(this).find('img').attr('src').indexOf('folder') !==-1 || (e.currentTarget.className !== 'folderIcon')) ? sys.openFolder(id) : ''/*(function(){alert('hola'); alert('adios')}());*/
 });
 
 $('body').on('keyup keydown', '.element .name', function(e) {
@@ -327,8 +345,9 @@ $('#search').click(async function(e) {
 	$('#search').animate({ 'opacity': 1 }, 400);
 	await sleep(400)
 	$('#search').animate({ 'width': '20%' }, 500);
-	$('#search').append('<input id="searching" placeholder="search"></input>').find();
-	$('#searching').attr('contenteditable', 'true').html('Search').removeAttr('style').css('font-size', '25pt');
+	$('#search').append('<input id="searching" placeholder="search" autofocus=true></input>')
+	// $('#searching').attr('contenteditable', 'true').html('Search').removeAttr('style').css('font-size', '25pt');
+	$('#searching').removeAttr('style').css('font-size', '25pt').focus();
 
 });
 
@@ -471,15 +490,13 @@ $('#home .forms').submit(function(e) {
 		$this.append('<div>' + d + '</div>');
 
 	})
-	console.log(obj);
 
 });
 
 $('#home').on('input', '#searching', function(e){
 	var val = this.value;
 	if($('#lavel').html().search('contSearch') == -1) 
-	$('#lavel').append('<div id="contSearch"></div>')
-	console.log(val)
+	$('#lavel').append('<div id="contSearch"></div></div>')
 	if (enviar)
 	$.post('server/php/proccess.php', {'function': 'search', 'val': val})
 	.done(function(d){
@@ -493,6 +510,14 @@ $('#home').on('input', '#searching', function(e){
 		console.log(error)*/
 	});
 	enviar = false;
+}).on('keydown', '#searching', async function(e){
+	if(e.which !== 27) return;
+	$(this).css('display', 'none');
+	$(this).parent().removeAttr('style').children('svg').css('display', 'block').animate({'opacity':1},200).children().animate({'opacity':1},750);
+	$(this).remove();
+	$('#section').animate({ 'height': '100vh', 'margin-top': '0' }, 750);
+	await sleep(750)
+	$('#section').removeAttr();
 });
 
 
