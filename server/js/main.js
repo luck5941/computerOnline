@@ -8,7 +8,7 @@ h = window.innerHeight,
 	searchClick = true,
 	section = $('section'),
 	liftButton = $('.liftButton');
-	if (page) var nivel = 0;
+if (page) var nivel = 0;
 
 
 function sleep(ms) {
@@ -114,11 +114,16 @@ function SYSTEM() {
 	this.exit = function() {
 		$("[value='exit']").click();
 	}
-	this.download = function() {
-		names = [];
-		for (var i = 0; i < this.selected.length; i++) {
-			names.push($('#' + this.selected[i]).find('.name').html());
+	this.download = function(name = true) {
+		console.log('poep')
+		if (name === true) {
+			var names = [];
+			for (var i = 0; i < this.selected.length; i++) {
+				names.push($('#' + this.selected[i]).find('.name').html());
+			}
 		}
+		else
+			var names = [name];
 		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { $('head').append(d) });
 		//location.href = 'server/php/descarga.php?names='+names[0]
 	}
@@ -254,7 +259,7 @@ function horiziontal(direccion) {
 	if (nivel == -1) nivel = 0;
 	if (nivel == 3) nivel = 2;
 	$('body, html').animate({ 'scrollLeft': $(section[nivel]).offset().left }, 750);
-	switch(nivel) {
+	switch (nivel) {
 		case 0:
 			var hash = 'forget';
 			break;
@@ -292,7 +297,7 @@ $('body').on('click', '.folderIcon', function() {
 	}
 });
 
-$('body').on('dblclick', '', function(){
+$('body').on('dblclick', '', function() {
 	sys.selectOne($(this));
 });
 
@@ -307,10 +312,16 @@ $(document).on('keyup keydown', function(e) {
 
 $('body').on('dblclick', '.folderIcon, .list', function(e) {
 	if ($(this).parent().attr('id') == 'upLevel') return;
+	var her = $(this);
 	console.log(e.currentTarget.className)
 	var id = (e.currentTarget.className == 'folderIcon') ? $(this).find('.name').html() : $(this).find('.path').html();
 	console.log(id);
-	return ($(this).find('img').attr('src').indexOf('folder') !==-1 || (e.currentTarget.className !== 'folderIcon')) ? sys.openFolder(id) : ''/*(function(){alert('hola'); alert('adios')}());*/
+	return ($(this).find('img').attr('src').indexOf('folder') !== -1 /*|| (e.currentTarget.className !== 'folderIcon')*/) ? sys.openFolder(id) : (function(){
+		let a = her.find('.path').html(),
+			b = her.find('.name').html();
+			console.log(a+'/'+b)
+			sys.download(a+'/'+b);
+	}());
 });
 
 $('body').on('keyup keydown', '.element .name', function(e) {
@@ -346,7 +357,7 @@ $('#search').click(async function(e) {
 	await sleep(400)
 	$('#search').animate({ 'width': '20%' }, 500);
 	$('#search').append('<input id="searching" placeholder="search" autofocus=true></input>')
-	// $('#searching').attr('contenteditable', 'true').html('Search').removeAttr('style').css('font-size', '25pt');
+		// $('#searching').attr('contenteditable', 'true').html('Search').removeAttr('style').css('font-size', '25pt');
 	$('#searching').removeAttr('style').css('font-size', '25pt').focus();
 
 });
@@ -493,27 +504,27 @@ $('#home .forms').submit(function(e) {
 
 });
 
-$('#home').on('input', '#searching', function(e){
+$('#home').on('input', '#searching', function(e) {
 	var val = this.value;
-	if($('#lavel').html().search('contSearch') == -1) 
-	$('#lavel').append('<div id="contSearch"></div></div>')
+	if ($('#lavel').html().search('contSearch') == -1)
+		$('#lavel').append('<div id="contSearch"></div></div>')
 	if (enviar)
-	$.post('server/php/proccess.php', {'function': 'search', 'val': val})
-	.done(function(d){
-		$('#contSearch').html(d);
-		enviar = true;
+		$.post('server/php/proccess.php', { 'function': 'search', 'val': val })
+		.done(function(d) {
+			$('#contSearch').html(d);
+			enviar = true;
 		})
-	.fail(function(xhr, status, error){
-		enviar = true;
-		console.log(xhr)
-		/*console.log(status)
-		console.log(error)*/
-	});
+		.fail(function(xhr, status, error) {
+			enviar = true;
+			console.log(xhr)
+				/*console.log(status)
+				console.log(error)*/
+		});
 	enviar = false;
-}).on('keydown', '#searching', async function(e){
-	if(e.which !== 27) return;
+}).on('keydown', '#searching', async function(e) {
+	if (e.which !== 27) return;
 	$(this).css('display', 'none');
-	$(this).parent().removeAttr('style').children('svg').css('display', 'block').animate({'opacity':1},200).children().animate({'opacity':1},750);
+	$(this).parent().removeAttr('style').children('svg').css('display', 'block').animate({ 'opacity': 1 }, 200).children().animate({ 'opacity': 1 }, 750);
 	$(this).remove();
 	$('#section').animate({ 'height': '100vh', 'margin-top': '0' }, 750);
 	await sleep(750)

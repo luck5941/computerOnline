@@ -302,7 +302,15 @@ class SYSTEM{
 
 	public function download($names) {
 		if(!is_dir('../download')) mkdir('../download');
-		if (count($_POST['names']) == 1 && is_file($this->path . "/" .$names[0])){
+		echo strpos($names[0], '/');
+		echo "<- important<br>";
+		if (strpos($names[0], '/') !==false){
+			$name = explode('/', $names[0]);
+			$name = $name[count($name)-1];
+			$names[0] =  (strpos($names[0], "undefined") !== false)? str_replace("undefined", $_SESSION['path'], $names[0]): "../..$names[0]";
+			copy($names[0], "../download/download_." .explode('.', $name)[1]);
+		}
+		elseif (count($_POST['names']) == 1 && is_file($this->path . "/" .$names[0])){
 			$name = $names[0];
 			copy($this->path . "/" .$names[0], "../download/download_." .explode('.', $name)[1]);
 		}
@@ -316,7 +324,7 @@ class SYSTEM{
 			}
 			$name = $this->compress($files);	
 		}
-		return (count($names) > 1) ? "<script>location.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\";</script>";
+		return (count($names) > 1) ? "<script>locattion.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
 					 
 
 	}
