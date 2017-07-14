@@ -1,1 +1,1 @@
- En este putno ya se ha genedado el sistema gráfico entero además de incorporarse un medio por el cual se crean carpetas y se guardan
+Gestor de archivos en una carpeta del pc a la que se puede acceder como si estuvieses en ella desde cualquier punto con acceso a internet siempre que ambas partes tengan conexion a internet
