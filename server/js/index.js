@@ -2,22 +2,22 @@ var section = $('section'),
 	links = $('.forms .links'),
 	form = $('form'),
 	sectionVP = location.hash.substring(1, location.hash.length),
-	n = 1;
+	nivel = 1;
 
 switch(sectionVP){
 	case 'newUser':
-		n=2;
+		nivel=2;
 		break;
 	case 'forget':
-		n=0;
+		nivel=0;
 		break;
 	case 'login':
 	default:
-		n = 1;
+		nivel = 1;
 		break;
 }
 
-$('html, body').animate({'scrollLeft': $(section[n]).offset().left},1);
+$('html, body').animate({'scrollLeft': $(section[nivel]).offset().left},1);
 $('.links[index=1]').css('text-decoration', 'underline');
 $(links).click(function(e){
 	var index = $(this).attr('index');

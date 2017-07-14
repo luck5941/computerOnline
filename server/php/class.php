@@ -21,13 +21,13 @@ class REGISTRO{
 
 	public function login($user, $pssw){
 		global $sql;
-		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where users='$user'");
+		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where mail='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 			$turn = $fila['turn'];
 		}
-		echo $turn; 
+		echo $turn;
 		$i = 0;
 		$psswrd = $pssw;
 		$this->turn = $this->uncryptNum($turn);
@@ -35,6 +35,7 @@ class REGISTRO{
 		for (;$i<=$this->turn; $i++){
 			$psswrd = sha1(md5($psswrd));
 		}
+		echo "<br>"."SELECT id_users from usuarios where psswrd='$psswrd'"."<br>";
 		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
@@ -44,12 +45,42 @@ class REGISTRO{
 		
 		if (count($ids) > 1){
 			$_SESSION['id'] = $ids[0];
+			$_SESSION['turn'] = $turn;
 			return ($ids[0] === $ids[1]) ? true : false;
 		}
 		else
 			return false;    
 			
 	}
+
+	public function changePssword($oldPssword, $newPssword, $newPssword2){
+		global $sql;
+		if ($newPssword == $newPssword2){
+			$this->turn = $this->uncryptNum($_SESSION['turn']);
+			$psswrd = $oldPssword;
+			for ($i=0;$i<=$this->turn; $i++){
+				$psswrd = sha1(md5($psswrd));
+			}
+			$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
+			while ($fila = mysqli_fetch_assoc($check)) {
+				$id = $fila['id_users'];
+			}
+			if (isset($id)){
+				if ($id == $_SESSION['id']){
+					$psswrdCryp = $this->crypPassword($newPssword);
+					return (mysqli_query($sql, "UPDATE usuarios set psswrd='".$psswrdCryp['psswrd']."', turn = '".$psswrdCryp['bin']."' where id_users= $id")) ? "Se ha cambiado correctamente" : "Fallo en el proceso";
+				}
+				else
+					return "Vaya, parece que la contraseña no coincide con la nuestra";
+			}
+			else
+				return "Vaya, parece que la contraseña no coincide con la nuestra";
+
+		}
+		else
+			return "las contraseñas no coinciden";
+	}
+
 
 	public function loadStyle() {
 		global $sql;
@@ -71,6 +102,23 @@ class REGISTRO{
 		return $style;
 	}
 
+	public function changeName($oldName, $newName){
+		global $sql;
+		$check = mysqli_query($sql, "SELECT id_users, turn from usuarios where users='$oldName'");
+		while ($fila = mysqli_fetch_assoc($check)) {
+			$id = $fila['id_users'];
+		}
+		if ($id == $_SESSION['id']){
+			if (mysqli_query($sql, "UPDATE usuarios set users='$newName' where id_users= $id")){
+				rename("../img/$oldName", "../img/$newName");
+				return "Proceso completado con exito";
+			}
+			else
+				return "Ha habido un fallo en el proceso";
+			}
+		else
+			return "Ha habido un fallo en el proceso";
+	}
 
 	public function changeTheme($theme) {
 		$this->updateDatabase(['theme' => $theme]);
@@ -80,18 +128,22 @@ class REGISTRO{
 		global $sql;
 		if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
 		if ($pssword1 !== $psswrd2) return "Las contraseñas no coinciden";
-		$this->turn = mt_rand(0, pow(10, 6));
-		$bin = $this->cryptNum($this->turn);
-		$i = 0;
-		$psswrd = $pssword1;
-		for (;$i<=$this->turn; $i++){
-			$psswrd = sha1(md5($psswrd));
-		}
-		echo "<br>INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '$psswrd', '$mail', 'default', '$bin')<br>";
-		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '$psswrd', '$mail', 'default', '$bin')")) ? "Registro con exito": "Vaya algo ha ido mal";
+		$psswrdCryp = $this->crypPassword($pssword1);
+		echo "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')";
+		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')")) ? "Registro con exito": "Vaya algo ha ido mal";
 		echo "<br>psswrd-> $psswrd<br>bin-> $bin<br>turn-> $this->turn";
 	}
 
+	private function crypPassword($psswrd){
+		$this->turn = mt_rand(0, pow(10, 6));
+		$bin = $this->cryptNum($this->turn);
+		$i = 0;
+		$psswrd = $psswrd;
+		for (;$i<=$this->turn; $i++){
+			$psswrd = sha1(md5($psswrd));
+		}
+		return ['bin'=>$bin, 'psswrd'=>$psswrd];
+	}
 	private function cryptNum($num){
 		$str = $this->str;
 		$bin = '';
@@ -103,11 +155,11 @@ class REGISTRO{
 			$num =  intval($num/$len);
 		}
 		$tmp = mt_rand(0, strlen($bin)-1);
-		echo $tmp;
+		//echo $tmp;
 		for ($i=0;$i<strlen($bin); $i++){
 			if($i ==$tmp){
 				$binDef .= "." . $str[$num];
-				echo "<br>Coincide<br>";
+				//echo "<br>Coincide<br>";
 			}
 			$binDef .= $bin[$i];
 		}
@@ -187,6 +239,7 @@ class SYSTEM{
 	private $main = '';
 	private $pathToSee = '';
 	private $zip = '';
+	private $find = [];
 
 	public function __construct($path) {
 		$this->path = $path;
@@ -196,7 +249,7 @@ class SYSTEM{
 			if ($folder == '')
 				$this->path = $_SESSION['path'];
 			else
-				$this->path .= "/$folder";
+				$this->path = (strpos('/', $folder) === false) ? $this->path . "/$folder": "pepe/$folder";
 			if ($this->path !== '../..'){
 				$this->pathToSee = str_replace('../../', '', $this->path);
 				$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><img src=\"server/img/upLevel.svg\"></div><div id=\"path\">$this->pathToSee</div></div>";
@@ -249,7 +302,15 @@ class SYSTEM{
 
 	public function download($names) {
 		if(!is_dir('../download')) mkdir('../download');
-		if (count($_POST['names']) == 1 && is_file($this->path . "/" .$names[0])){
+		echo strpos($names[0], '/');
+		echo "<- important<br>";
+		if (strpos($names[0], '/') !==false){
+			$name = explode('/', $names[0]);
+			$name = $name[count($name)-1];
+			$names[0] =  (strpos($names[0], "undefined") !== false)? str_replace("undefined", $_SESSION['path'], $names[0]): "../..$names[0]";
+			copy($names[0], "../download/download_." .explode('.', $name)[1]);
+		}
+		elseif (count($_POST['names']) == 1 && is_file($this->path . "/" .$names[0])){
 			$name = $names[0];
 			copy($this->path . "/" .$names[0], "../download/download_." .explode('.', $name)[1]);
 		}
@@ -263,7 +324,7 @@ class SYSTEM{
 			}
 			$name = $this->compress($files);	
 		}
-		return (count($names) > 1) ? "<script>location.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\";</script>";
+		return (count($names) > 1) ? "<script>locattion.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
 					 
 
 	}
@@ -339,6 +400,56 @@ class SYSTEM{
 				echo "<div class=\"element\" id=\"$name[0]_$name[1]\"><div class=\"folderIcon\"><img src=\"server/img/file.svg\"><div class=\"name\">$name[0].$name[1]</div></div></div>";
 			}
 		}
+	}
+
+	private function findInside($str, $path){
+		$files = array_diff(scandir($path), ['.', '..', '.git', 'server']);
+		foreach ($files as $file) {
+			if (strpos($file, $str) !== false){
+				if (!isset($this->find[$path])){
+					$this->find[$path] = [];
+					//echo "no existe y ahora si";
+				}
+				$this->find[$path][] = $file;
+			}
+			if (is_dir("$path/$file"))
+				//echo "is dir_ $path/$file";
+				$this->findInside($str, "$path/$file");
+		}
+		
+	}
+
+
+	public function search($str){
+		if (strpos($str, '/')!== false){
+			$path = '../..';
+			$str = substr($str, 1);
+		}
+		else
+			$path = $_SESSION['path'];
+		if ($str == '') return;
+		$this->findInside($str, $path);
+		//print_r($this->find);
+		echo "<div class=\"group\">";
+		$i = 0;
+		foreach ($this->find as $key => $value) {
+			foreach ($value as $subKey => $subValue) {
+				// echo "\n$key contiente  $subValue\n";
+				$i++;
+				$icon = is_dir("$key/$subValue") ? "folder" : "file";
+				echo "<div class=\"list\">
+						<div class=\"icon\">
+							<img  src=\"server/img/$icon.svg\">
+						</div>
+						<div class=\"name\">$subValue</div>
+						<div class=\"path\">".substr($key, 5)."</div>
+					</div>";
+				if ($i%6 == 0)
+					echo "</div><div class=\"group\">";
+			}
+		}
+		echo "</div>";
+
 	}
 
 }
