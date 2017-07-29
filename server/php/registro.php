@@ -22,14 +22,13 @@ switch ($function){
 		$mail = $_POST['mail'];
 		$answer = $user->newUser($userName, $pssword1, $pssword2, $mail);
 		$_SESSION['error_2'] = $answer;
-		echo $answer;
-		//return header('location: ../../index.php#newUser');
+		return header('location: ../../index.php#newUser');
 		break;
 	case 'exit':
 		$user->exit();
 		$sys = new SYSTEM($_SESSION['path']);
 		$sys->removeDir('../download');
-		header('location: ../../index.php');
+		header('location: ../../');
 		
 
 }
@@ -40,3 +39,5 @@ switch ($function){
 
 
 ?>
+
+

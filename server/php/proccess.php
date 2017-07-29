@@ -34,6 +34,9 @@ if (isset($_POST['function'])){
 		case 'search':
 			$sys->search($_POST['val']);
 			break;
+        case 'forgotPsswrd':
+            $user->newPassword($_POST['user'], $_POST['mail']);
+            break;
 		default:
 			echo "$function <- default";
 			break;

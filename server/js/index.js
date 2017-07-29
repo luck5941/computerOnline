@@ -18,7 +18,8 @@ switch(sectionVP){
 }
 
 $('html, body').animate({'scrollLeft': $(section[nivel]).offset().left},1);
-$('.links[index=1]').css('text-decoration', 'underline');
+//$('html, body').scrollLeft($(section[nivel]).offset().left);
+$('.links[index='+nivel+']').css('text-decoration', 'underline');
 $(links).click(function(e){
 	var index = $(this).attr('index');
 	$('html, body').animate({'scrollLeft': $(section[index]).offset().left},1500, 'swing');

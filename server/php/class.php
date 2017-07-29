@@ -1,4 +1,5 @@
 <?php
+require('mail.php');
 define("HOST", "localhost");
 define("USER_DB", "root");
 define("PASSWD", "");
@@ -21,6 +22,7 @@ class REGISTRO{
 
 	public function login($user, $pssw){
 		global $sql;
+        echo "SELECT id_users, turn from usuarios where mail='$user'";
 		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where mail='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
@@ -41,18 +43,15 @@ class REGISTRO{
 			$ids[] = $fila['id_users'];
 		}
 		echo count($ids); 
-		//return (isset($_SESSION['path'])) ? true: false;
-		
 		if (count($ids) > 1){
 			$_SESSION['id'] = $ids[0];
 			$_SESSION['turn'] = $turn;
 			return ($ids[0] === $ids[1]) ? true : false;
 		}
 		else
-			return false;    
-			
+			return false;
 	}
-
+    
 	public function changePssword($oldPssword, $newPssword, $newPssword2){
 		global $sql;
 		if ($newPssword == $newPssword2){
@@ -80,8 +79,7 @@ class REGISTRO{
 		else
 			return "las contraseñas no coinciden";
 	}
-
-
+    
 	public function loadStyle() {
 		global $sql;
 		$check =  mysqli_query($sql, "SELECT theme from usuarios where id_users='$this->id'");
@@ -144,6 +142,7 @@ class REGISTRO{
 		}
 		return ['bin'=>$bin, 'psswrd'=>$psswrd];
 	}
+    
 	private function cryptNum($num){
 		$str = $this->str;
 		$bin = '';
@@ -217,6 +216,7 @@ class REGISTRO{
 			return $decimal;
 		}
 	*/
+    
 	private function updateDatabase ($values){
 		global $sql;
 		foreach ($values as $key => $value) {
@@ -229,11 +229,49 @@ class REGISTRO{
 		session_destroy();
 		return true;
 	}
+    
+    public function newPassword($name, $mail){
+        global $sql;
+        $name = mysqli_real_escape_string($sql, $name);
+        $mail = mysqli_real_escape_string($sql, $mail);
+        echo "<br>$name</br>";
+        echo "SELECT id_users, turn from usuarios where mail='$mail' and users='$name'";
+        $check =  mysqli_query($sql, "SELECT id_users from usuarios where mail='$mail' and users='$name'");
+        if ($check){
+            while($fila = mysqli_fetch_assoc($check)){
+                $id = $fila['id_users'];
+            }
+            $password = substr(md5(microtime()), 0, 10);
+            $psswrdCryp = $this->crypPassword($password);
+            $update = mysqli_query($sql, "UPDATE usuarios set psswrd='".$psswrdCryp['psswrd']."', turn = '".$psswrdCryp['bin']."' where id_users= $id");
+            if ($update){
+                $sending = $this->sendMail($mail, $password, $name);
+                $_SESSION['error_0'] = $sending ? "Se ha enviado" : "Fallo al enviar";
+                return header('location: ../../index.php#forget');
+            }
+            else
+                $_SESSION['error_0'] = "Fallo en el sistema, intentelo de nuevo más tarde"; 
+        }
+        else return "Vaya parece que no estás registrado";
+        echo $check;
+        echo $turn;
+    }
+    
+    private function sendMail($mailUser, $password, $name){
+        global $mail;
+        echo $name;
+        $mail->setFrom($mailUser, "$name");
+        $mail->AddAddress($mailUser, "$name");
+        $mail->Subject = "Nueva contraseña";
+        $content = file_get_contents('mailsTemplate/newPsswrd.html');
+        $content = str_replace('$name', $name, $content);
+        $content = str_replace('$password', $password, $content);
+        $mail->msgHTML($content);
+        return $mail->Send();
+         
+    }
 }
 
-/**
-* 
-*/
 class SYSTEM{    
 	private $path = '';
 	private $main = '';
@@ -453,7 +491,6 @@ class SYSTEM{
 	}
 
 }
-
 
 
 ?>
