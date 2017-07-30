@@ -2,8 +2,9 @@
 <html>
 
 <head>
-	<title>My drive</title>
+	<title>Computer Online</title>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php
 //session_start();
 include 'server/php/class.php';
@@ -175,20 +176,9 @@ $usr = new REGISTRO();
 		<svg viewBox="0 0 100 100" preserveAspectRatio="none">
 			<rect x="5" y="1" width="90" height="15" fill="white" />
 			<rect x="7.5" y="3.5" width="85" height="10" fill="none" stroke="var(--secondColor)" stroke-width="1" id="progressBarCont" />
-			<rect x="8.5" y="4.5" width="83" height="8" id="progressBar">
+			<rect x="8.5" y="4.5" width="83" height="8" id="progressBar" />
 		</svg>
 	</div>
-<!-- <div id="carga">
-	<svg viewBox="0 0 100 100" preserveAspectRatio="none">
-		<g >
-		<path d="M10 0 A 45 45 -1 1 1 20 50" class="line"/>
-			<!-- <circle cx=50 cy=50 r=25 /> 
-
-
-		</g>
-	</svg>
-</div> -->
-
 	<script type="text/javascript" src="server/js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="server/js/main.js"></script>
 </body>

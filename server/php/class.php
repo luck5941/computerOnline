@@ -22,23 +22,21 @@ class REGISTRO{
 
 	public function login($user, $pssw){
 		global $sql;
-        echo "SELECT id_users, turn from usuarios where mail='$user'";
+        $user = mysqli_real_escape_string($sql, $user);
 		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where mail='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 			$turn = $fila['turn'];
 		}
-		echo $turn;
 		$i = 0;
 		$psswrd = $pssw;
 		$this->turn = $this->uncryptNum($turn);
-		echo "<br>" . $this->turn . "<br>"; 
 		for (;$i<=$this->turn; $i++){
 			$psswrd = sha1(md5($psswrd));
 		}
-		echo "<br>"."SELECT id_users from usuarios where psswrd='$psswrd'"."<br>";
-		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
+        $psswrd = mysqli_real_escape_string($sql, $psswrd);
+		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 		}
@@ -124,12 +122,13 @@ class REGISTRO{
 
 	public function newUser($userName, $pssword1, $psswrd2, $mail){
 		global $sql;
-		if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
+        if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
 		if ($pssword1 !== $psswrd2) return "Las contraseñas no coinciden";
 		$psswrdCryp = $this->crypPassword($pssword1);
-		echo "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')";
-		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')")) ? "Registro con exito": "Vaya algo ha ido mal";
-		echo "<br>psswrd-> $psswrd<br>bin-> $bin<br>turn-> $this->turn";
+        $userName = mysqli_real_escape_string($sql, $userName);
+        $mail = mysqli_real_escape_string($sql, $mail);
+        $query = "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')";
+		return  (mysqli_query($sql, $query)) ? "Registro con exito": "Vaya, parece que algo ha ido mal. ¿Puede que ya estes registrado?";
 	}
 
 	private function crypPassword($psswrd){
@@ -234,13 +233,13 @@ class REGISTRO{
         global $sql;
         $name = mysqli_real_escape_string($sql, $name);
         $mail = mysqli_real_escape_string($sql, $mail);
-        echo "<br>$name</br>";
-        echo "SELECT id_users, turn from usuarios where mail='$mail' and users='$name'";
+        echo "SELECT id_users from usuarios where mail='$mail' and users='$name'";
         $check =  mysqli_query($sql, "SELECT id_users from usuarios where mail='$mail' and users='$name'");
         if ($check){
             while($fila = mysqli_fetch_assoc($check)){
                 $id = $fila['id_users'];
             }
+            printf(count($fila));
             $password = substr(md5(microtime()), 0, 10);
             $psswrdCryp = $this->crypPassword($password);
             $update = mysqli_query($sql, "UPDATE usuarios set psswrd='".$psswrdCryp['psswrd']."', turn = '".$psswrdCryp['bin']."' where id_users= $id");
@@ -313,7 +312,6 @@ class SYSTEM{
 		
 	}
 
-
 	public function changeName($name) {
 		echo "\nchangeName en  classPHP\nname=$name[0]\n";
 		if (is_dir("$this->path/$name[0]") || is_file("$this->path/$name[0]")){
@@ -362,7 +360,7 @@ class SYSTEM{
 			}
 			$name = $this->compress($files);	
 		}
-		return (count($names) > 1) ? "<script>locattion.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
+		return (count($names) > 1) ? "<script>location.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
 					 
 
 	}
@@ -456,7 +454,6 @@ class SYSTEM{
 		}
 		
 	}
-
 
 	public function search($str){
 		if (strpos($str, '/')!== false){

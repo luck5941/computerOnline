@@ -22,7 +22,7 @@ switch ($function){
 		$mail = $_POST['mail'];
 		$answer = $user->newUser($userName, $pssword1, $pssword2, $mail);
 		$_SESSION['error_2'] = $answer;
-		return header('location: ../../index.php#newUser');
+        return header('location: ../../index.php#newUser');
 		break;
 	case 'exit':
 		$user->exit();

@@ -1,5 +1,6 @@
-var w = window.innerWidth
-h = window.innerHeight,
+const MOBILE = (/Android|Iphone|Ipad|Ipod|Opera Mini/i.test(navigator.userAgent));
+var w = window.innerWidth,
+    h = window.innerHeight,
 	mainColor = '#00edff20',
 	add = false,
 	multiple = false,
@@ -8,6 +9,7 @@ h = window.innerHeight,
 	searchClick = true,
 	section = $('section'),
 	liftButton = $('.liftButton');
+
 if (page) var nivel = 0;
 
 
@@ -20,14 +22,6 @@ function sleep(ms) {
 guardan en la estructura del main en home.html
 (ahora comentada)
 */
-Array.prototype.getIndex = function(str) {
-	for (var i = 0; i < this.length; i++) {
-		if (str == this[i]) return i;
-	}
-	return false
-};
-
-
 
 
 function SYSTEM() {
@@ -50,7 +44,7 @@ function SYSTEM() {
 	}
 	this.selectOne = function(el) {
 		var id = el.attr('id');
-		var index = this.selected.getIndex(id);
+		var index = this.selected.indexOf(id);
 		if (index === false) {
 			$('.element').css('background-color', 'inherit');
 			el.css('background-color', mainColor);
@@ -63,7 +57,7 @@ function SYSTEM() {
 	}
 	this.select = function(el) {
 		var id = el.attr('id');
-		var index = this.selected.getIndex(id);
+		var index = this.selected.indexOf(id);
 		if (index === false) {
 			el.css('background-color', mainColor);
 			this.selected.push(id)
@@ -106,7 +100,6 @@ function SYSTEM() {
 
 	this.openFolder = function(name) {
 		$.post('server/php/proccess.php', { 'function': 'openDirectory', 'name': name }, function(d) {
-			console.log(d)
 			$('main').html(d);
 		});
 	}
@@ -115,7 +108,6 @@ function SYSTEM() {
 		$("[value='exit']").click();
 	}
 	this.download = function(name = true) {
-		console.log('poep')
 		if (name === true) {
 			var names = [];
 			for (var i = 0; i < this.selected.length; i++) {
@@ -124,9 +116,10 @@ function SYSTEM() {
 		}
 		else
 			var names = [name];
-		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { $('head').append(d) });
+		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { $('head').append(d);});    
 		//location.href = 'server/php/descarga.php?names='+names[0]
-	}
+    }
+    
 	this.upLevel = function() {
 
 		$.post('server/php/proccess.php', { 'function': 'upLevel' }, function(d) {
@@ -145,21 +138,6 @@ function SYSTEM() {
 		}
 
 		upload.uploadFile(data);
-		/*
-		$.ajax({
-			url: "server/php/proccess.php",
-			type: 'POST',
-			data: data,
-			processData: false,
-			contentType: false,
-			success: function(d) {
-				$('main').append(d);
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				console.log(xhr + "\n" + ajaxOptions + "\n" + thrownError);
-			}
-		});
-		*/
 	}
 
 	this.changeTheme = function(theme) {
@@ -209,21 +187,6 @@ function UPLOAD() {
 
 }
 
-
-/*
-function ELEMENT(id) {
-	this.x = 0;
-	this.y = 0;
-	this.jqr = '';
-	this.id = id; 
-	this.loadElem = function() {
-		this.jqr = $('#'+this.id);
-		var offset = this.jqr.offset()
-		this.x = offset.left;
-		this.y = offset.top;
-	}
-	this.loadElem()
-}*/
 var sys = new SYSTEM();
 var upload = new UPLOAD();
 
@@ -254,7 +217,7 @@ function ascendente(direccion) {
 	$(liftButton[nivel]).css({ 'color': '#ffffff', 'border-color': '#ffffff', 'background-color': 'var(--secondColor)' });
 }
 
-function horiziontal(direccion) {
+function horizontal(direccion) {
 	nivel = (direccion) ? nivel - 1 : nivel + 1;
 	if (nivel == -1) nivel = 0;
 	if (nivel == 3) nivel = 2;
@@ -274,7 +237,13 @@ function horiziontal(direccion) {
 	location.hash = hash;
 }
 
-
+async function removeSearch(her) {
+    $(her).parent().removeAttr('style').children('svg').css('display', 'block').animate({ 'opacity': 1 }, 200).children().animate({ 'opacity': 1 }, 750);
+    $(her).remove();
+    $('#section').animate({ 'height': '100vh', 'margin-top': '0' }, 750);
+    await sleep(750)
+    $('#section').removeAttr();   
+}
 
 
 $('body').on('click', '.folderIcon', function() {
@@ -301,10 +270,6 @@ $('body').on('dblclick', '', function() {
 	sys.selectOne($(this));
 });
 
-
-
-
-
 $(document).on('keyup keydown', function(e) {
 	if (e.shiftKey) return;
 	multiple = true;
@@ -313,9 +278,7 @@ $(document).on('keyup keydown', function(e) {
 $('body').on('dblclick', '.folderIcon, .list', function(e) {
 	if ($(this).parent().attr('id') == 'upLevel') return;
 	var her = $(this);
-	console.log(e.currentTarget.className)
 	var id = (e.currentTarget.className == 'folderIcon') ? $(this).find('.name').html() : $(this).find('.path').html();
-	console.log(id);
 	return ($(this).find('img').attr('src').indexOf('folder') !== -1 /*|| (e.currentTarget.className !== 'folderIcon')*/) ? sys.openFolder(id) : (function(){
 		let a = her.find('.path').html(),
 			b = her.find('.name').html();
@@ -345,10 +308,9 @@ $('#añadir').click(function() {
 $('#exit').click(function(e) { sys.exit(); });
 
 $('#search').click(async function(e) {
-	if (e.target.nodeName.toLowerCase() !== 'circle') return;
-	searchClick = false;
+	if (e.target.nodeName.toLowerCase() !== 'circle' && !MOBILE) return;
+    searchClick = false;
 	$('#section').animate({ 'height': '80vh', 'margin-top': '15vh' }, 1000);
-	console.log('entra')
 	$('#search *').children().animate({ 'opacity': 0 }, 500);
 	await sleep(500)
 	$('#search svg').css('display', 'none');
@@ -357,9 +319,7 @@ $('#search').click(async function(e) {
 	await sleep(400)
 	$('#search').animate({ 'width': '20%' }, 500);
 	$('#search').append('<input id="searching" placeholder="search" autofocus=true></input>')
-		// $('#searching').attr('contenteditable', 'true').html('Search').removeAttr('style').css('font-size', '25pt');
 	$('#searching').removeAttr('style').css('font-size', '25pt').focus();
-
 });
 
 
@@ -371,9 +331,6 @@ $('#setting').click(function(e) {
 	else
 		$('#settingMenu').css('display', 'none');
 });
-
-
-
 
 $('body').on('dblclick', '#upLevel .folderIcon', function() {
 	sys.upLevel();
@@ -425,7 +382,7 @@ $(document).keydown(function(e) {
 			if (page)
 				ascendente(false);
 			else
-				horiziontal(false);
+				horizontal(false);
 			break;
 		case 38: //arriba
 		case 37: // izq
@@ -433,17 +390,17 @@ $(document).keydown(function(e) {
 			if (page)
 				ascendente(true);
 			else
-				horiziontal(true);
+				horizontal(true);
 			break;
 		default:
 			console.log(e.which);
 			break;
 	}
-}).keyup(function(e) {
+})
+.keyup(function(e) {
 	add = false;
 	multiple = false;
 });
-
 
 /*
 ---------------------------------Personalización------------------------------------
@@ -507,7 +464,7 @@ $('#home .forms').submit(function(e) {
 $('#home').on('input', '#searching', function(e) {
 	var val = this.value;
 	if ($('#lavel').html().search('contSearch') == -1)
-		$('#lavel').append('<div id="contSearch"></div></div>')
+		$('#lavel').prepend('<div id="contSearch"></div></div>')
 	if (enviar)
 		$.post('server/php/proccess.php', { 'function': 'search', 'val': val })
 		.done(function(d) {
@@ -521,21 +478,18 @@ $('#home').on('input', '#searching', function(e) {
 				console.log(error)*/
 		});
 	enviar = false;
-}).on('keydown', '#searching', async function(e) {
-	if (e.which !== 27) return;
-	$(this).css('display', 'none');
-	$(this).parent().removeAttr('style').children('svg').css('display', 'block').animate({ 'opacity': 1 }, 200).children().animate({ 'opacity': 1 }, 750);
-	$(this).remove();
-	$('#section').animate({ 'height': '100vh', 'margin-top': '0' }, 750);
-	await sleep(750)
-	$('#section').removeAttr();
+})
+.on('keydown', '#searching', async function(e) {
+	if (e.which === 27) return removeSearch(this);
 });
-
-
-
-
 
 if (page) {
 	$('#settingMenu').css({ 'top': $('header').offset().top + w * 0.06, 'left': $('#setting').offset().left - w * 0.15, 'display': 'none' });
 	$('html, body').animate({ 'scrollTop': 0 }, 1);
 }
+
+$('body').on('touchstart', function(){
+    let l = $('#searching');
+    if (l.length == 1)
+        removeSearch(l)
+});

@@ -5,8 +5,9 @@ session_start();
 <html>
 
 <head>
-    <title>.</title>
+    <title>Computer Online</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style type="text/css">
          :root {
             --firstColor: #DFFCFF;
@@ -23,10 +24,11 @@ session_start();
         <div class="forms">
             <div class="init">Cambio de contraseña</div>
             <form action="server/php/proccess.php" method="POST">
-                <p>Nombre de usuario: </p><input class="input" type="text" name="user">
-                <p>correo: </p><input class="input" type="email" name="mail">
+                <p>user Name: </p><input class="input" type="text" name="user">
+                <div style="clear:both"></div>
+                <p>mail: </p><input class="input" type="email" name="mail">
                 <input style="display: none" name="function" value="forgotPsswrd">
-                <div><input type="submit" value="Enviar"></div>
+                <div class="submit"><input type="submit" value="Enviar"></div>
             </form>
             <div class=error>
                 <?=(isset($_SESSION['error_0']) ? $_SESSION['error_0'] : '')?>
@@ -40,10 +42,11 @@ session_start();
         <div id="login" class="forms">
             <div class="init">Tienes que inicar sesión para continuar</div>
             <form action="server/php/registro.php" method="POST">
-                <p>Correo electronico: </p><input class="input" type="text" name="user">
+                <p>mail: </p><input class="input" type="text" name="user">
+                <div style="clear:both"></div>
                 <p>Contraseña: </p><input class="input" type="password" name="pssword1">
                 <input style="display: none" name="function" value="login">
-                <div><input type="submit" value="Enviar"></div>
+                <div class="submit"><input type="submit" value="Enviar"></div>
             </form>
             <div class=error>
                 <?=(isset($_SESSION['error_1']) ? $_SESSION['error_1'] : '')?>
@@ -53,17 +56,20 @@ session_start();
             <div class=links index="2">¿No tienes cuenta?</div>
         </div>
     </section>
-
     <section>
         <div class="forms">
             <div class="init">Registro</div>
             <form action="server/php/registro.php" method="POST">
-                <p>Nombre de usuario: </p><input class="input" type="password" name="user">
+                <p>Nombre de usuario: </p><input class="input" type="text" name="user">
+                <div style="clear:both;"></div>
                 <p>Mail: </p><input class="input" type="email" name="mail">
+                <div style="clear:both;"></div>
                 <p>Contraseña: </p><input class="input" type="password" name="pssword1">
-                <p>Vuelve a introducir la contraseña: </p><input class="input" type="password" name="pssword2">
+                <div style="clear:both;"></div>
+                <p>Repita la contraseña: </p><input class="input" type="password" name="pssword2">
+                <div style="clear:both;"></div>
                 <input style="display: none" name="function" value="newUser">
-                <div><input type="submit" value="Enviar"></div>
+                <div class="submit"><input type="submit" value="Enviar"></div>
             </form>
 
             <div class=error>

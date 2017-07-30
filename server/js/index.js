@@ -17,14 +17,18 @@ switch(sectionVP){
 		break;
 }
 
-$('html, body').animate({'scrollLeft': $(section[nivel]).offset().left},1);
-//$('html, body').scrollLeft($(section[nivel]).offset().left);
+//$('html, body').animate({'scrollLeft': $(section[nivel]).offset().left},1);
+$('html, body').scrollLeft($(section[nivel]).offset().left);
 $('.links[index='+nivel+']').css('text-decoration', 'underline');
 $(links).click(function(e){
-	var index = $(this).attr('index');
-	$('html, body').animate({'scrollLeft': $(section[index]).offset().left},1500, 'swing');
+	let index = $(this).attr('index');
+    let t = (MOBILE) ? 500 : 750;
+	$('html, body').animate({'scrollLeft': $(section[index]).offset().left},t);
+    if (MOBILE) $('html, body').scrollTop(0);
 	$(links).css('text-decoration', 'none');
 	$('.links[index='+index+']').css('text-decoration', 'underline');
+    hash = (index == '0') ? 'forget' : (index == '1') ? 'login' : 'newUser';
+    location.hash = hash;
 
 });
 
