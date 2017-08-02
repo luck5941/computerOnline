@@ -186,7 +186,7 @@ function UPLOAD() {
 			console.log(e);
 			var percentComplete = Math.round(e.loaded * 100 / e.total),
 				percent = (parseInt($('#progressBarCont').attr('width')) - 2) * percentComplete / 100;
-			$('#progressBar').attr('width', percent);
+			$('#progressBar').attr({'width': (parseInt($('#progressBarCont').attr('width'))-2-percent), 'x': (8+percent)});
 
 
 		} else {
@@ -403,7 +403,8 @@ $(':file').change(function() {
 
 
 $(document).keydown(function(e) {
-	if (e.target.nodeName.toLowerCase() == 'input')
+	console.log(e.target.isContentEditable) 
+	if (e.target.nodeName.toLowerCase() == 'input' || e.target.isContentEditable)
 		return;
 	var key = e.which;
 	switch (key) {

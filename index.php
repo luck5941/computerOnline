@@ -4,7 +4,7 @@ session_start();
 <!DOCTYPE html>
 <html>
 <head>
-	<title>.</title>
+	<title>Computer Online</title>
 	<meta charset="utf-8">
 	<style type="text/css">
 		:root{

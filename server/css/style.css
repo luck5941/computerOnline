@@ -116,8 +116,9 @@ header {
 	fill: var(--secondColor);
 	stroke: #fff;
 }
-
-
+.folderIcon:hover .line{
+	fill: var(--secondColor);	
+}
 
 .line, .subline{
 	stroke: var(--secondColor);
@@ -136,7 +137,6 @@ header {
 	background-color: var(--secondColor);
 	box-shadow: 10px 10px 20px #00000050;
 }
-
 
 #settingMenu nav li:hover {
 	color: var(--secondColor);
@@ -251,6 +251,10 @@ header {
  #upLevel .folderIcon{
  	width: 5%;
  }
+#upLevel .folderIcon svg {
+	width: 100%;
+}
+
  #forms {
  	margin-top: 5%;
  	width: 100%;
@@ -350,7 +354,7 @@ section:nth-child(2n+1) {
 	text-align: center;
 	color: white;
 	padding-top: 2.5vh;
-	display: none;;
+	display: none;
 }
 #progress svg {
 	width: 90%;

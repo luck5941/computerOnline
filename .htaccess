@@ -1,0 +1,36 @@
+order deny,allow
+deny from all
+
+php_value post_max_size 50000M
+php_value upload_max_filesize 50000M
+php_value memory_limit 50000M
+
+allow from localhost
+allow from 127.0.0.1
+#allow from 192.168.1.
+allow from 213.37.158.14
+
+<FilesMatch "(.html|.js|.php|.css|.svg)">
+	order deny,allow
+	allow from all
+</FilesMatch>
+
+
+<Files ~ "^\.(htaccess|htpasswd)$">
+deny from all
+</Files>
+
+##<FilesMatch ".*\.\w*$">
+##allow from all
+##</FilesMatch>
+#
+#
+#<FilesMatch "^(download_)[A-z-_¿0-9\s]*(\.[A-z-_¿0-9\s]*)*\w*$>
+#allow from all
+#</FilesMatch>
+#
+
+
+
+
+

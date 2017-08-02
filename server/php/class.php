@@ -252,14 +252,23 @@ class SYSTEM{
 				$this->path = (strpos('/', $folder) === false) ? $this->path . "/$folder": "pepe/$folder";
 			if ($this->path !== '../..'){
 				$this->pathToSee = str_replace('../../', '', $this->path);
-				$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><img src=\"server/img/upLevel.svg\"></div><div id=\"path\">$this->pathToSee</div></div>";
+				//$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><svg viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\">
+				/*$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><svg viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\">
+					<path class=\"line\" d=\"M20 2 L5 20 L15 20 L15 98 L80 98 L80 40 L65 40 L65 75 L25 75 L25 20 L35 20 z\"/>
+				</svg></div><div id=\"path\">$this->pathToSee</div></div>";*/
+				$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><svg viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\"><polygon class=\"line\" points=\"23.7,0 0,26.5 15.7,26.5 15.7,86.9 84.2,86.9 84.2,58.3 68.1,58.3 68,70.8 31.8,70.8 31.9,26.6 
+	47.6,26.6 \"/></svg></div><div id=\"path\">$this->pathToSee</div></div>";
 			}				
 			//echo "this->path -> $this->path<br>";
 			$files = scandir("$this->path");
 			$_SESSION['path'] =  $this->path;
 			//echo "last session -> ". $_SESSION['path'];
 			foreach ($files as $key) {
-				if ($key === '.' || $key === '..' || $key == '.git')
+				$coincide = preg_match('/\w*\.php|html|sql|server/', $key, $algo);
+				/*echo "la longitud del resultado es: " . count($algo) ." para $key<br>";
+				echo $algo[0] . "<br>";
+				echo $algo[1] . "<br>";*/
+				if (strpos($key, '.') === 0|| $coincide)
 					continue;
 				if(is_file("$this->path/$key")){
 					$key = explode('.', $key);
