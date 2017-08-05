@@ -2,12 +2,11 @@
 include 'class.php';
 $sys = new SYSTEM($_SESSION['path']);
 $user = new REGISTRO();
-
 if (isset($_POST['function'])){
 	$function = $_POST['function'];
 	switch ($function) {
 		case 'load':
-			echo $sys->load();
+			echo $sys->load();			
 			break;
 		case 'changeName':
 			echo $sys->changeName($_POST['name']);
@@ -34,6 +33,9 @@ if (isset($_POST['function'])){
 		case 'search':
 			$sys->search($_POST['val']);
 			break;
+        case 'forgotPsswrd':
+            $user->newPassword($_POST['user'], $_POST['mail']);
+            break;
 		default:
 			echo "$function <- default";
 			break;

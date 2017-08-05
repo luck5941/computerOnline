@@ -1,11 +1,12 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require('mail.php');
 define("HOST", "localhost");
 define("USER_DB", "root");
 define("PASSWD", "");
 define("NAME_BD", "myDrive");
-
 session_start();
-
 if (!isset($_SESSION['path']))
 	$_SESSION['path'] = '../..';
 
@@ -21,38 +22,34 @@ class REGISTRO{
 
 	public function login($user, $pssw){
 		global $sql;
+        $user = mysqli_real_escape_string($sql, $user);
 		$check =  mysqli_query($sql, "SELECT id_users, turn from usuarios where mail='$user'");
 		$ids = [];
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 			$turn = $fila['turn'];
 		}
-		echo $turn;
 		$i = 0;
 		$psswrd = $pssw;
 		$this->turn = $this->uncryptNum($turn);
-		echo "<br>" . $this->turn . "<br>"; 
 		for (;$i<=$this->turn; $i++){
 			$psswrd = sha1(md5($psswrd));
 		}
-		echo "<br>"."SELECT id_users from usuarios where psswrd='$psswrd'"."<br>";
-		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");				
+        $psswrd = mysqli_real_escape_string($sql, $psswrd);
+		$check =  mysqli_query($sql, "SELECT id_users from usuarios where psswrd='$psswrd'");
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 		}
 		echo count($ids); 
-		//return (isset($_SESSION['path'])) ? true: false;
-		
 		if (count($ids) > 1){
 			$_SESSION['id'] = $ids[0];
 			$_SESSION['turn'] = $turn;
 			return ($ids[0] === $ids[1]) ? true : false;
 		}
 		else
-			return false;    
-			
+			return false;
 	}
-
+    
 	public function changePssword($oldPssword, $newPssword, $newPssword2){
 		global $sql;
 		if ($newPssword == $newPssword2){
@@ -80,8 +77,7 @@ class REGISTRO{
 		else
 			return "las contraseñas no coinciden";
 	}
-
-
+    
 	public function loadStyle() {
 		global $sql;
 		$check =  mysqli_query($sql, "SELECT theme from usuarios where id_users='$this->id'");
@@ -96,7 +92,7 @@ class REGISTRO{
 				$style = ":root{--firstColor: #f2eaca;--secondColor: #f2db82;--thirdColor: #c67a09;}";
 				break;
 			case 'green':
-				$style = ":root{--firstColor: #bef9d8;--secondColor: #82f297;--thirdColor: #48b486;}";
+				$style = ":root{--firstColor: #bef9d8;--secondColor: #82d291;--thirdColor: #48b486;}";
 				break;
 		}
 		return $style;
@@ -126,12 +122,13 @@ class REGISTRO{
 
 	public function newUser($userName, $pssword1, $psswrd2, $mail){
 		global $sql;
-		if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
+        if ($userName == '' || $pssword1 == '' || $psswrd2 == '' || $mail == '') return "Rellena todos los campos, por favor";
 		if ($pssword1 !== $psswrd2) return "Las contraseñas no coinciden";
 		$psswrdCryp = $this->crypPassword($pssword1);
-		echo "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')";
-		return  (mysqli_query($sql, "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')")) ? "Registro con exito": "Vaya algo ha ido mal";
-		echo "<br>psswrd-> $psswrd<br>bin-> $bin<br>turn-> $this->turn";
+        $userName = mysqli_real_escape_string($sql, $userName);
+        $mail = mysqli_real_escape_string($sql, $mail);
+        $query = "INSERT INTO usuarios (users, psswrd, mail, theme, turn) VALUES ('$userName', '".$psswrdCryp['psswrd']."', '$mail', 'default', '". $psswrdCryp['bin'] ."')";
+		return  (mysqli_query($sql, $query)) ? "Registro con exito": "Vaya, parece que algo ha ido mal. ¿Puede que ya estes registrado?";
 	}
 
 	private function crypPassword($psswrd){
@@ -144,6 +141,7 @@ class REGISTRO{
 		}
 		return ['bin'=>$bin, 'psswrd'=>$psswrd];
 	}
+    
 	private function cryptNum($num){
 		$str = $this->str;
 		$bin = '';
@@ -217,6 +215,7 @@ class REGISTRO{
 			return $decimal;
 		}
 	*/
+    
 	private function updateDatabase ($values){
 		global $sql;
 		foreach ($values as $key => $value) {
@@ -229,11 +228,49 @@ class REGISTRO{
 		session_destroy();
 		return true;
 	}
+    
+    public function newPassword($name, $mail){
+        global $sql;
+        $name = mysqli_real_escape_string($sql, $name);
+        $mail = mysqli_real_escape_string($sql, $mail);
+        echo "SELECT id_users from usuarios where mail='$mail' and users='$name'";
+        $check =  mysqli_query($sql, "SELECT id_users from usuarios where mail='$mail' and users='$name'");
+        if ($check){
+            while($fila = mysqli_fetch_assoc($check)){
+                $id = $fila['id_users'];
+            }
+            printf(count($fila));
+            $password = substr(md5(microtime()), 0, 10);
+            $psswrdCryp = $this->crypPassword($password);
+            $update = mysqli_query($sql, "UPDATE usuarios set psswrd='".$psswrdCryp['psswrd']."', turn = '".$psswrdCryp['bin']."' where id_users= $id");
+            if ($update){
+                $sending = $this->sendMail($mail, $password, $name);
+                $_SESSION['error_0'] = $sending ? "Se ha enviado" : "Fallo al enviar";
+                return header('location: ../../index.php#forget');
+            }
+            else
+                $_SESSION['error_0'] = "Fallo en el sistema, intentelo de nuevo más tarde"; 
+        }
+        else return "Vaya parece que no estás registrado";
+        echo $check;
+        echo $turn;
+    }
+    
+    private function sendMail($mailUser, $password, $name){
+        global $mail;
+        echo $name;
+        $mail->setFrom($mailUser, "$name");
+        $mail->AddAddress($mailUser, "$name");
+        $mail->Subject = "Nueva contraseña";
+        $content = file_get_contents('mailsTemplate/newPsswrd.html');
+        $content = str_replace('$name', $name, $content);
+        $content = str_replace('$password', $password, $content);
+        $mail->msgHTML($content);
+        return $mail->Send();
+         
+    }
 }
 
-/**
-* 
-*/
 class SYSTEM{    
 	private $path = '';
 	private $main = '';
@@ -284,7 +321,6 @@ class SYSTEM{
 		
 	}
 
-
 	public function changeName($name) {
 		echo "\nchangeName en  classPHP\nname=$name[0]\n";
 		if (is_dir("$this->path/$name[0]") || is_file("$this->path/$name[0]")){
@@ -311,8 +347,6 @@ class SYSTEM{
 
 	public function download($names) {
 		if(!is_dir('../download')) mkdir('../download');
-		echo strpos($names[0], '/');
-		echo "<- important<br>";
 		if (strpos($names[0], '/') !==false){
 			$name = explode('/', $names[0]);
 			$name = $name[count($name)-1];
@@ -321,7 +355,7 @@ class SYSTEM{
 		}
 		elseif (count($_POST['names']) == 1 && is_file($this->path . "/" .$names[0])){
 			$name = $names[0];
-			copy($this->path . "/" .$names[0], "../download/download_." .explode('.', $name)[1]);
+			copy($this->path . "/" .$names[0], "../download/download_." .explode('.', $name)[1]);			
 		}
 		elseif (count($_POST['names']) == 1 && is_dir($this->path . "/" .$names[0])){
 			$name = $this->compress([$this->path . "/" .$names[0]]);
@@ -331,9 +365,9 @@ class SYSTEM{
 			foreach ($names as $key ) {
 				$files[] = "$this->path/$key";
 			}
-			$name = $this->compress($files);	
+			$name = $this->compress($files);			
 		}
-		return (count($names) > 1) ? "<script>locattion.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
+		return (count($names) > 1) ? "<script>location.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
 					 
 
 	}
@@ -428,7 +462,6 @@ class SYSTEM{
 		
 	}
 
-
 	public function search($str){
 		if (strpos($str, '/')!== false){
 			$path = '../..';
@@ -462,7 +495,6 @@ class SYSTEM{
 	}
 
 }
-
 
 
 ?>
