@@ -116,15 +116,13 @@ function SYSTEM() {
 		else
 			var names = [name];
 		console.log(names);
-		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { 
-			console.log(d);
+		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { 			
 			$('head').append(d);
 		}).fail(function(xhr, status, error){
 			console.log(xhr);
 			console.log(status);
 			console.log(error);
 		});
-		//location.href = 'server/php/descarga.php?names='+names[0]
     }
     
 	this.upLevel = function() {
@@ -138,8 +136,6 @@ function SYSTEM() {
 		var data = new FormData();
 		if (files) {
 			$.each(files, function(i, file) {
-				console.log("file" + i);
-				console.log(file);
 				data.append("files[]", file);
 			});
 		}
@@ -205,7 +201,6 @@ function loadElemts() {
 	}
 }
 
-//loadElemts();
 
 function ascendente(direccion) {
 	nivel = (direccion) ? nivel - 1 : nivel + 1;
@@ -218,7 +213,6 @@ function ascendente(direccion) {
 		$('body, html').animate({ 'scrollTop': $(section[nivel - 1]).offset().top }, 750);
 		$('#lift, #ancla').animate({ 'opacity': 1 }, 750);
 	}
-	console.log(nivel)
 	liftButton.removeAttr('style');
 	$(liftButton[nivel]).css({ 'color': '#ffffff', 'border-color': '#ffffff', 'background-color': 'var(--secondColor)' });
 }
@@ -258,11 +252,9 @@ $('body').on('click', '.folderIcon', function() {
 		if (multiple) {
 			var element = $('.element');
 			sys.select($(this).parent());
-			sys.pos.push($(this).parent().index('.element'));
-			console.log(sys.pos)
+			sys.pos.push($(this).parent().index('.element'));			
 			if (sys.pos.length > 1) {
 				for (var i = sys.pos[0] + 1; i < sys.pos[sys.pos.length - 1]; i++) {
-					console.log(i)
 					sys.select($(element[i]));
 				}
 			}
@@ -270,11 +262,7 @@ $('body').on('click', '.folderIcon', function() {
 			sys.selectOne($(this).parent());
 	}
 });
-/*
-$('body').on('dblclick', '', function() {
-	sys.selectOne($(this));
-});
-*/
+
 
 $(document).on('keyup keydown', function(e) {
 	if (e.shiftKey) return;
@@ -288,8 +276,7 @@ $('body').on('dblclick', '.folderIcon, .list', function(e) {
 	var id = (e.currentTarget.className == 'folderIcon') ? $(this).find('.name').html() : $(this).find('.path').html();
 	return ($(this).find('img').attr('src').indexOf('folder') !== -1 /*|| (e.currentTarget.className !== 'folderIcon')*/) ? sys.openFolder(id) : (function(){
 		let a = her.find('.path').html(),
-			b = her.find('.name').html();
-			console.log(a+'/'+b)
+			b = her.find('.name').html();			
 			sys.download(a+'/'+b);
 	}());
 });
@@ -366,8 +353,7 @@ $(':file').change(function() {
 })
 
 
-$(document).keydown(function(e) {
-	console.log(e.target.isContentEditable) 
+$(document).keydown(function(e) {	 
 	if (e.target.nodeName.toLowerCase() == 'input' || e.target.isContentEditable)
 		return;
 	var key = e.which;
@@ -460,9 +446,8 @@ $('#home .forms').submit(function(e) {
 	for (var i = 0; i < input.length - 1; i++) {
 		eval('obj.' + $(input[i]).attr('name') + ' = "' + $(input[i]).val() + '"')
 	}
-	console.log($this.find('form').attr('action'));
+	
 	$.post($this.find('form').attr('action'), obj, function(d) {
-		console.log(d)
 		$this.append('<div>' + d + '</div>');
 
 	})
@@ -482,8 +467,6 @@ $('#home').on('input', '#searching', function(e) {
 		.fail(function(xhr, status, error) {
 			enviar = true;
 			console.log(xhr)
-				/*console.log(status)
-				console.log(error)*/
 		});
 	enviar = false;
 })

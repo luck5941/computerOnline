@@ -11,8 +11,7 @@ if (isset($_POST['function'])){
 		case 'changeName':
 			echo $sys->changeName($_POST['name']);
 			break;
-		case 'openDirectory':
-			//echo $_POST['name'] . " En proccess.php<br>";
+		case 'openDirectory':			
 			echo $sys->load($_POST['name']);
 			break;
 		case 'upLevel':

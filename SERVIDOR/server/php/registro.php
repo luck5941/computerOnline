@@ -1,5 +1,4 @@
 <?php
-echo "function vale $function";
 include 'class.php';
 $user = new REGISTRO();		
 $function = $_POST['function'];
@@ -10,8 +9,7 @@ switch ($function){
 		if ($user->login($userName, $psswrd1))
 			return header('location: ../../home.php');
 		else{
-			$_SESSION['error_1'] = 'Fallo en la autentificación';
-			echo '<br>Fallo en la autentificación';
+			$_SESSION['error_1'] = 'Fallo en la autentificación';			
 			return header('location: ../../index.php');
 		}
 		break;
@@ -29,10 +27,8 @@ switch ($function){
 		$sys = new SYSTEM($_SESSION['path']);
 		$sys->removeDir('../download');
 		header('location: ../../');
-		
-
 }
-//echo "name: $userName<br>password: $psswrd1<br>";
+
 
 
 

@@ -1,9 +1,10 @@
 /.gitignore
-/server/php/tmp.py
-/server/php/class_copy.php
+SERVIDOR/server/php/tmp.py
+SERVIDOR/server/php/class_copy.php
 /demo
-/server/img/img.7z
-/server/php/ftp.php
-/server/download
-/toSend.tar
-/server/php/mail/*
+/SERVIDOR/server/img/img.7z
+/SERVIDOR/server/php/ftp.php
+/SERVIDOR/download
+/SERVIDOR/server/php/mail/*
+/TRABAJOS
+/tar
