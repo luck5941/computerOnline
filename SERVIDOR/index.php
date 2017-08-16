@@ -7,6 +7,7 @@ session_start();
     <title>Computer Online</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="server/img/favicon.ico" type="image/x-icon"/>
     <style type="text/css">
          :root {
             --firstColor: #DFFCFF;

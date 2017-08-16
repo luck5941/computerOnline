@@ -6,6 +6,7 @@
 	<meta name="description" content="Free service to get access to one folder of your pc by internet">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="utf-8">
+	<link rel="icon" href="server/img/favicon.ico" type="image/x-icon"/>
 	
 	<?php
 		include 'server/php/class.php';
