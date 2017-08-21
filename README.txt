@@ -1,1 +1,0 @@
-Gestor de archivos en una carpeta del pc a la que se puede acceder como si estuvieses en ella desde cualquier punto con acceso a internet siempre que ambas partes tengan conexion a internet

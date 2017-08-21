@@ -176,10 +176,11 @@
     
     #settingMenu {
         position: absolute;
-        left: 50%;
+        left: 56.7%;
         width: 20%;
         background-color: var(--secondColor);
         box-shadow: 10px 10px 20px #00000050;
+        top:8.8vw;
     }
     
     #settingMenu nav li:hover {
@@ -256,7 +257,7 @@
         float: right;
         border: 3px solid var(--secondColor);
         color: var(--secondColor);
-        width: 2%;
+        width: 2vw;
         /* 20% of the viewport width */
         height: 2vw;
         text-align: center;
@@ -458,7 +459,7 @@
     
     #contSearch .path {
         /*float: right;
-	margin: 0 5%;*/
+		margin: 0 5%;*/
     }
     /*
 #carga {
@@ -486,7 +487,6 @@
     rotate(90deg)
     translate(0, 100%);
 }*/
-
 @media (max-width: 600px) {
     .forms {
         margin: 10% 14%;
@@ -516,6 +516,9 @@
     #searching {
         margin-bottom: 20%;
     }
+    #settingMenu nav li {
+		font-size: 8pt !important;	
+	}
 }
 
 @media (max-width: 600px) and (orientation: landscape) {
@@ -571,4 +574,5 @@
         width: 42%;
         text-align: left;
     }
+
 }

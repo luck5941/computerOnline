@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<title>Computer Online</title>
-	<meta charset="utf-8">
+	<meta name="author" content="Lucas Elvira">
+	<meta name="description" content="Free service to get access to one folder of your pc by internet">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">
+	<link rel="icon" href="server/img/favicon.ico" type="image/x-icon"/>
+	
 	<?php
-//session_start();
-include 'server/php/class.php';
-if (!isset($_SESSION['id'])) return header('location: index.html');
-$usr = new REGISTRO();
-?>
-		<style type="text/css">
-		<?=$usr->loadStyle();
-		?>
-		</style>
-		<link rel="stylesheet" type="text/css" href="server/css/style.css">
+		include 'server/php/class.php';
+		if (!isset($_SESSION['id'])) return header('location: index.php');
+		$usr = new REGISTRO();
+	?>
+	<style type="text/css">
+		<?=$usr->loadStyle();?>
+	</style>
+	<link rel="stylesheet" type="text/css" href="server/css/style.css">
 </head>
 
 <body id="home" onselectstart="return false">
@@ -174,9 +175,25 @@ $usr = new REGISTRO();
 	<div id="progress">
 		SUBIDO
 		<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+<!-- <<<<<<< HEAD -->
+			<defs>
+					<linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+					<stop offset="0%" style="stop-color: #2B0000; stop-opacity: 1" />
+					<stop offset="25%" style="stop-color: #9A2512; stop-opacity: 1" />
+					<stop offset="50%" style="stop-color: #640052; stop-opacity: 1" />
+					<stop offset="75%" style="stop-color: #2970C5; stop-opacity: 1" />
+					<stop offset="100%" style="stop-color: #00C9CE; stop-opacity: 1" />
+				</linearGradient>
+			</defs>
+			<rect x="5" y="1" width="90" height="7" fill="white" />
+			<rect x="7.5" y="3" width="85" height="3" fill="none" stroke="var(--secondColor)" stroke-width="1" id="progressBarCont" />
+			<rect x="8" y="3.75" width="84" height="1.5" fill="url(#grad1)" />
+			<rect x="8" y="3.75" width="84" height="1.5" id="progressBar" fill="white" />
+<!-- =======
 			<rect x="5" y="1" width="90" height="15" fill="white" />
 			<rect x="7.5" y="3.5" width="85" height="10" fill="none" stroke="var(--secondColor)" stroke-width="1" id="progressBarCont" />
 			<rect x="8.5" y="4.5" width="83" height="8" id="progressBar" />
+>>>>>>> 4273a8e4bd9c442689f2676b8c2eaab022e195a4 -->
 		</svg>
 	</div>
 	<script type="text/javascript" src="server/js/jquery-3.1.1.min.js"></script>

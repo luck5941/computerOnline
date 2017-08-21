@@ -39,13 +39,14 @@ function SYSTEM() {
 			method: 'post',
 			encoding: "utf-8",
 			success: function(data) { $('main').html(data) },
-			error: function(e) { alert(e) }
+			error: function(e) { console.log(e) }
 		});
 	}
-	this.selectOne = function(el) {
+
+	this.selectOne = function(el) {		
 		var id = el.attr('id');
 		var index = this.selected.indexOf(id);
-		if (index === false) {
+		if (index === -1) {
 			$('.element').css('background-color', 'inherit');
 			el.css('background-color', mainColor);
 			this.selected = [];
@@ -77,9 +78,7 @@ function SYSTEM() {
 	this.changeName = function() {
 		$('body').removeAttr('onselectstart');
 		this.selectedName.push($('#' + this.selected[0]).find('.name').html())
-		$('#' + this.selected[0]).find('.name').attr('contenteditable', 'true').css({ 'border-bottom': '1px solid black' }).focus().select();
-		console.log(this.selectedName[0] + 'linea 74-> changeName')
-
+		$('#' + this.selected[0]).find('.name').attr('contenteditable', 'true').css({ 'border-bottom': '1px solid black' }).focus().select();	
 	}
 
 	this.exitChangeName = function(newName) {
@@ -116,8 +115,14 @@ function SYSTEM() {
 		}
 		else
 			var names = [name];
-		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { $('head').append(d);});    
-		//location.href = 'server/php/descarga.php?names='+names[0]
+		console.log(names);
+		$.post('server/php/proccess.php', { 'function': 'download', 'names': names }, function(d) { 			
+			$('head').append(d);
+		}).fail(function(xhr, status, error){
+			console.log(xhr);
+			console.log(status);
+			console.log(error);
+		});
     }
     
 	this.upLevel = function() {
@@ -131,8 +136,6 @@ function SYSTEM() {
 		var data = new FormData();
 		if (files) {
 			$.each(files, function(i, file) {
-				console.log("file" + i);
-				console.log(file);
 				data.append("files[]", file);
 			});
 		}
@@ -164,7 +167,7 @@ function UPLOAD() {
 			console.log(e);
 			var percentComplete = Math.round(e.loaded * 100 / e.total),
 				percent = (parseInt($('#progressBarCont').attr('width')) - 2) * percentComplete / 100;
-			$('#progressBar').attr('width', percent);
+			$('#progressBar').attr({'width': (parseInt($('#progressBarCont').attr('width'))-2-percent), 'x': (8+percent)});
 
 
 		} else {
@@ -184,7 +187,6 @@ function UPLOAD() {
 	this.uploadCanceled = function(evt) {
 		console.log("The upload has been canceled by the user or the browser dropped the connection.");
 	}
-
 }
 
 var sys = new SYSTEM();
@@ -199,7 +201,6 @@ function loadElemts() {
 	}
 }
 
-//loadElemts();
 
 function ascendente(direccion) {
 	nivel = (direccion) ? nivel - 1 : nivel + 1;
@@ -212,7 +213,6 @@ function ascendente(direccion) {
 		$('body, html').animate({ 'scrollTop': $(section[nivel - 1]).offset().top }, 750);
 		$('#lift, #ancla').animate({ 'opacity': 1 }, 750);
 	}
-	console.log(nivel)
 	liftButton.removeAttr('style');
 	$(liftButton[nivel]).css({ 'color': '#ffffff', 'border-color': '#ffffff', 'background-color': 'var(--secondColor)' });
 }
@@ -245,7 +245,6 @@ async function removeSearch(her) {
     $('#section').removeAttr();   
 }
 
-
 $('body').on('click', '.folderIcon', function() {
 	if (add)
 		sys.select($(this).parent())
@@ -253,11 +252,9 @@ $('body').on('click', '.folderIcon', function() {
 		if (multiple) {
 			var element = $('.element');
 			sys.select($(this).parent());
-			sys.pos.push($(this).parent().index('.element'));
-			console.log(sys.pos)
+			sys.pos.push($(this).parent().index('.element'));			
 			if (sys.pos.length > 1) {
 				for (var i = sys.pos[0] + 1; i < sys.pos[sys.pos.length - 1]; i++) {
-					console.log(i)
 					sys.select($(element[i]));
 				}
 			}
@@ -266,9 +263,6 @@ $('body').on('click', '.folderIcon', function() {
 	}
 });
 
-$('body').on('dblclick', '', function() {
-	sys.selectOne($(this));
-});
 
 $(document).on('keyup keydown', function(e) {
 	if (e.shiftKey) return;
@@ -277,12 +271,12 @@ $(document).on('keyup keydown', function(e) {
 
 $('body').on('dblclick', '.folderIcon, .list', function(e) {
 	if ($(this).parent().attr('id') == 'upLevel') return;
+	e.stopPropagation();
 	var her = $(this);
 	var id = (e.currentTarget.className == 'folderIcon') ? $(this).find('.name').html() : $(this).find('.path').html();
 	return ($(this).find('img').attr('src').indexOf('folder') !== -1 /*|| (e.currentTarget.className !== 'folderIcon')*/) ? sys.openFolder(id) : (function(){
 		let a = her.find('.path').html(),
-			b = her.find('.name').html();
-			console.log(a+'/'+b)
+			b = her.find('.name').html();			
 			sys.download(a+'/'+b);
 	}());
 });
@@ -292,7 +286,6 @@ $('body').on('keyup keydown', '.element .name', function(e) {
 	e.preventDefault();
 	sys.exitChangeName($(this));
 	sys.unselect();
-
 });
 
 $('body, main, header').click(function(e) {
@@ -332,7 +325,8 @@ $('#setting').click(function(e) {
 		$('#settingMenu').css('display', 'none');
 });
 
-$('body').on('dblclick', '#upLevel .folderIcon', function() {
+$('body').on('dblclick', '#upLevel .folderIcon', function(e) {
+	e.stopPropagation();
 	sys.upLevel();
 });
 
@@ -359,8 +353,8 @@ $(':file').change(function() {
 })
 
 
-$(document).keydown(function(e) {
-	if (e.target.nodeName.toLowerCase() == 'input')
+$(document).keydown(function(e) {	 
+	if (e.target.nodeName.toLowerCase() == 'input' || e.target.isContentEditable)
 		return;
 	var key = e.which;
 	switch (key) {
@@ -452,9 +446,8 @@ $('#home .forms').submit(function(e) {
 	for (var i = 0; i < input.length - 1; i++) {
 		eval('obj.' + $(input[i]).attr('name') + ' = "' + $(input[i]).val() + '"')
 	}
-	console.log($this.find('form').attr('action'));
+	
 	$.post($this.find('form').attr('action'), obj, function(d) {
-		console.log(d)
 		$this.append('<div>' + d + '</div>');
 
 	})
@@ -474,8 +467,6 @@ $('#home').on('input', '#searching', function(e) {
 		.fail(function(xhr, status, error) {
 			enviar = true;
 			console.log(xhr)
-				/*console.log(status)
-				console.log(error)*/
 		});
 	enviar = false;
 })
@@ -484,8 +475,8 @@ $('#home').on('input', '#searching', function(e) {
 });
 
 if (page) {
-	$('#settingMenu').css({ 'top': $('header').offset().top + w * 0.06, 'left': $('#setting').offset().left - w * 0.15, 'display': 'none' });
-	$('html, body').animate({ 'scrollTop': 0 }, 1);
+	$('#settingMenu').css({'display': 'none' });
+	$('html, body').scrollTop(0)
 }
 
 $('body').on('touchstart', function(){

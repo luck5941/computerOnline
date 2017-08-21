@@ -2,18 +2,16 @@
 include 'class.php';
 $sys = new SYSTEM($_SESSION['path']);
 $user = new REGISTRO();
-
 if (isset($_POST['function'])){
 	$function = $_POST['function'];
 	switch ($function) {
 		case 'load':
-			echo $sys->load();
+			echo $sys->load();			
 			break;
 		case 'changeName':
 			echo $sys->changeName($_POST['name']);
 			break;
-		case 'openDirectory':
-			//echo $_POST['name'] . " En proccess.php<br>";
+		case 'openDirectory':			
 			echo $sys->load($_POST['name']);
 			break;
 		case 'upLevel':

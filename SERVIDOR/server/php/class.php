@@ -1,14 +1,14 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require('mail.php');
 define("HOST", "localhost");
 define("USER_DB", "root");
-define("PASSWD", "");
-define("NAME_BD", "myDrive");
-
+define("PASSWD", "38973417elviralucas");
+define("NAME_BD", "computerOnline");
 session_start();
-
 if (!isset($_SESSION['path']))
-	$_SESSION['path'] = '../..';
+	$_SESSION['path'] = '../../../TRABAJOS/';
 
 $sql = mysqli_connect(HOST, USER_DB, PASSWD, NAME_BD);
 
@@ -40,7 +40,7 @@ class REGISTRO{
 		while ($fila = mysqli_fetch_assoc($check)) {
 			$ids[] = $fila['id_users'];
 		}
-		echo count($ids); 
+		 
 		if (count($ids) > 1){
 			$_SESSION['id'] = $ids[0];
 			$_SESSION['turn'] = $turn;
@@ -92,7 +92,7 @@ class REGISTRO{
 				$style = ":root{--firstColor: #f2eaca;--secondColor: #f2db82;--thirdColor: #c67a09;}";
 				break;
 			case 'green':
-				$style = ":root{--firstColor: #bef9d8;--secondColor: #82f297;--thirdColor: #48b486;}";
+				$style = ":root{--firstColor: #bef9d8;--secondColor: #82d291;--thirdColor: #48b486;}";
 				break;
 		}
 		return $style;
@@ -106,7 +106,7 @@ class REGISTRO{
 		}
 		if ($id == $_SESSION['id']){
 			if (mysqli_query($sql, "UPDATE usuarios set users='$newName' where id_users= $id")){
-				rename("../img/$oldName", "../img/$newName");
+				//rename("../img/$oldName", "../img/$newName");
 				return "Proceso completado con exito";
 			}
 			else
@@ -153,11 +153,9 @@ class REGISTRO{
 			$num =  intval($num/$len);
 		}
 		$tmp = mt_rand(0, strlen($bin)-1);
-		//echo $tmp;
 		for ($i=0;$i<strlen($bin); $i++){
 			if($i ==$tmp){
 				$binDef .= "." . $str[$num];
-				//echo "<br>Coincide<br>";
 			}
 			$binDef .= $bin[$i];
 		}
@@ -175,53 +173,12 @@ class REGISTRO{
 		}
 		return $tmp;
 	}
-
-	/*
-		private function findNum($str, $chr){
-			for ($i =0; $i<strlen($str); $i++){
-				if ($str[$i] === $chr)
-					return $i;
-			}
-		}
-		private function cryptNum($num){
-			$tmpBin = '';
-			$bin = '';
-			$i;
-			while ($num>=1){
-				$tmpBin .= strval($num%2);
-				$num = $num/2;
-			}
-			echo "tmpBin-> $tmpBin<br>";
-			$i = strlen($tmpBin)-1;
-			echo "i vale: $i<br>";
-			while ( $i>= 0) {
-				$bin .= $tmpBin[$i];
-				$i--;
-			 }
-
-
-			return $bin;
-		}
-
-		private function uncryptNum($num){
-			$power = 0;
-			$decimal = 0;
-			while ($num != 0) {
-				$lstDigit = $num%10;
-				$decimal += $lstDigit * pow(2, $power);
-				$power++;
-				$num = $num/10;
-			}
-			return $decimal;
-		}
-	*/
     
 	private function updateDatabase ($values){
 		global $sql;
 		foreach ($values as $key => $value) {
 			mysqli_query($sql, "update usuarios set $key='$value' where id_users = $this->id");
 		}
-
 	}
 
 	public function exit(){
@@ -232,14 +189,16 @@ class REGISTRO{
     public function newPassword($name, $mail){
         global $sql;
         $name = mysqli_real_escape_string($sql, $name);
-        $mail = mysqli_real_escape_string($sql, $mail);
-        echo "SELECT id_users from usuarios where mail='$mail' and users='$name'";
+        $mail = mysqli_real_escape_string($sql, $mail);        
         $check =  mysqli_query($sql, "SELECT id_users from usuarios where mail='$mail' and users='$name'");
         if ($check){
             while($fila = mysqli_fetch_assoc($check)){
                 $id = $fila['id_users'];
             }
-            printf(count($fila));
+            if (!isset($id)) {
+            	$_SESSION['error_0'] = "Ups, parece que no te tenemos en nuestro sistema";
+            	return header('location: ../../index.php#forget');
+            }
             $password = substr(md5(microtime()), 0, 10);
             $psswrdCryp = $this->crypPassword($password);
             $update = mysqli_query($sql, "UPDATE usuarios set psswrd='".$psswrdCryp['psswrd']."', turn = '".$psswrdCryp['bin']."' where id_users= $id");
@@ -252,8 +211,6 @@ class REGISTRO{
                 $_SESSION['error_0'] = "Fallo en el sistema, intentelo de nuevo más tarde"; 
         }
         else return "Vaya parece que no estás registrado";
-        echo $check;
-        echo $turn;
     }
     
     private function sendMail($mailUser, $password, $name){
@@ -279,33 +236,40 @@ class SYSTEM{
 	private $find = [];
 
 	public function __construct($path) {
-		$this->path = $path;
+		$this->path = $path;		
 	}
 
 	public function load($folder = ''){
+			$pattern = '/(\.{2}\/){3}(TRABAJOS)\/*\w+/';
 			if ($folder == '')
 				$this->path = $_SESSION['path'];
-			else
-				$this->path = (strpos('/', $folder) === false) ? $this->path . "/$folder": "pepe/$folder";
-			if ($this->path !== '../..'){
-				$this->pathToSee = str_replace('../../', '', $this->path);
-				$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><img src=\"server/img/upLevel.svg\"></div><div id=\"path\">$this->pathToSee</div></div>";
+			else{
+				if (strpos('/', $folder) === false)
+					$this->path= $this->path . "/$folder";
+			}
+			if (preg_match($pattern, $this->path)){
+				$pattern = '/(\.{2}\/){3}(TRABAJOS)\/*/';
+				$this->pathToSee = preg_replace($pattern, '', $this->path);
+				//$this->pathToSee = preg_replace($pattern, '', $this->pathToSee);
+
+				$this->main = "<div class=\"element\" id=\"upLevel\"><div class=\"folderIcon\"><svg viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\"><polygon class=\"line\" points=\"23.7,0 0,26.5 15.7,26.5 15.7,86.9 84.2,86.9 84.2,58.3 68.1,58.3 68,70.8 31.8,70.8 31.9,26.6 47.6,26.6 \"/></svg></div><div id=\"path\">$this->pathToSee</div></div>";
 			}				
-			//echo "this->path -> $this->path<br>";
+			
 			$files = scandir("$this->path");
 			$_SESSION['path'] =  $this->path;
-			//echo "last session -> ". $_SESSION['path'];
+			
 			foreach ($files as $key) {
-				if ($key === '.' || $key === '..' || $key == '.git')
+				$coincide = preg_match('/\w*\.php|html|sql|server/', $key, $algo);
+				if (strpos($key, '.') === 0|| $coincide)
 					continue;
 				if(is_file("$this->path/$key")){
 					$key = explode('.', $key);
-					$this->main .=  "<div class=\"element\" id=\"$key[0]_$key[1]\"><div class=\"folderIcon\"><img src=\"server/img/file.svg\"><div class=\"name\">$key[0].$key[1]</div></div></div>";
+					$ext =  array_pop($key);
+					$key = join('.', $key);
+					$this->main .=  "<div class=\"element\" id=\"" . str_replace(".", "_", $key) . "_$ext\"><div class=\"folderIcon\"><img src=\"server/img/file.svg\"><div class=\"name\">$key.$ext</div></div></div>";
 				}
 				elseif(is_dir("$this->path/$key"))
-					$this->main .= "<div class=\"element\" id=\"$key\"><div class=\"folderIcon\"><img src=\"server/img/folder.svg\"><div class=\"name\">$key</div></div></div>";
-				else 
-					echo "<br>en el else: $this->path/$key";
+					$this->main .= "<div class=\"element\" id=\"$key\"><div class=\"folderIcon\"><img src=\"server/img/folder.svg\"><div class=\"name\">$key</div></div></div>";				
 						
 			}
 			return $this->main;
@@ -330,7 +294,7 @@ class SYSTEM{
 		for ($i = 0; $i< count($path)-2; $i++){
 			$tmp .= $path[$i] . "/";
 		}
-		$tmp = substr($tmp, 0,-1);
+		//$tmp = substr($tmp, 0,-1);
 		$this->path = $tmp;
 		$_SESSION['path'] = $tmp;
 		echo $this->load($path[count($path)-2]);
@@ -338,8 +302,6 @@ class SYSTEM{
 
 	public function download($names) {
 		if(!is_dir('../download')) mkdir('../download');
-		echo strpos($names[0], '/');
-		echo "<- important<br>";
 		if (strpos($names[0], '/') !==false){
 			$name = explode('/', $names[0]);
 			$name = $name[count($name)-1];
@@ -348,7 +310,7 @@ class SYSTEM{
 		}
 		elseif (count($_POST['names']) == 1 && is_file($this->path . "/" .$names[0])){
 			$name = $names[0];
-			copy($this->path . "/" .$names[0], "../download/download_." .explode('.', $name)[1]);
+			copy($this->path . "/" .$names[0], "../download/download_." .explode('.', $name)[1]);			
 		}
 		elseif (count($_POST['names']) == 1 && is_dir($this->path . "/" .$names[0])){
 			$name = $this->compress([$this->path . "/" .$names[0]]);
@@ -357,12 +319,10 @@ class SYSTEM{
 			$files = [];
 			foreach ($names as $key ) {
 				$files[] = "$this->path/$key";
-			}
-			$name = $this->compress($files);	
+			}			
+			$name = $this->compress($files);			
 		}
 		return (count($names) > 1) ? "<script>location.href=\"server/php/descarga.php?names=descarga.zip\";</script>" : "<script>location.href=\"server/php/descarga.php?names=".$name ."\"</script/>";
-					 
-
 	}
 
 	private function compress($path, $name=''){
@@ -403,7 +363,6 @@ class SYSTEM{
 	private function copyFiles($source, $dest){
 		$name = explode('/', $source);
 		$name = $name[count($name)-1];
-		//echo "<br>source->$source<br>dest->$dest<br>";
 		if (is_file($source))
 			copy($source, "$dest/$name");
 		elseif (is_dir($source)) {
@@ -417,7 +376,7 @@ class SYSTEM{
 	}
 
 	public function removeDir($path){
-		//echo "<br>path->$path<br>";
+		
 		if (is_file($path))
 			unlink($path);
 		elseif (is_dir($path)){
@@ -443,8 +402,7 @@ class SYSTEM{
 		foreach ($files as $file) {
 			if (strpos($file, $str) !== false){
 				if (!isset($this->find[$path])){
-					$this->find[$path] = [];
-					//echo "no existe y ahora si";
+					$this->find[$path] = [];					
 				}
 				$this->find[$path][] = $file;
 			}
