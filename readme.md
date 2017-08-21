@@ -37,7 +37,7 @@ Se ha realizado bajo los terminos de [LGPL-3.0](https://opensource.org/licenses/
 
 La estructura de carpetas esta formada de la siguiente manera:
 ```
-computerOnline
+SERVIDOR
     |index.php -> formulario de registro, inicio de sesión y recuperación de contraseñas
 	|home.php -> página con la que interactuar con la aplicación en cuestion
 	|server -> carpeta con toda la lógica
@@ -59,4 +59,5 @@ computerOnline
 			|mailsTemplate -> carpeta con las plantillas para los mails
 			    |newPsswrd.html
 		|sql -> carpeta contenedora de la base de datos vacia
+|CARPETA CON LOS ARCHIVOS, EN MI CASO TRABAJOS
 ```

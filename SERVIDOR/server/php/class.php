@@ -1,10 +1,8 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require('mail.php');
 define("HOST", "localhost");
 define("USER_DB", "root");
-define("PASSWD", "38973417elviralucas");
+define("PASSWD", "");
 define("NAME_BD", "computerOnline");
 session_start();
 if (!isset($_SESSION['path']))
